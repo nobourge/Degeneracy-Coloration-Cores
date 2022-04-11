@@ -72,7 +72,11 @@ public class DrawGraph {
     public static void drawGraph(int[][] adj) {
         int N = adj.length;
         //int screenWidth =
-        StdDraw.setCanvasSize(800, 800);
+        final int WIDTH = 1500;
+        final int WIDTH_CENTER = WIDTH / 2;
+        final int HEIGHT = 850;
+        final int HEIGHT_CENTER = HEIGHT / 2;
+        StdDraw.setCanvasSize(WIDTH, HEIGHT);
         StdDraw.setXscale(0, N);
         StdDraw.setYscale(0, N);
         StdDraw.setPenRadius(0.01);
@@ -80,18 +84,39 @@ public class DrawGraph {
         StdDraw.setPenColor(StdDraw.WHITE);
 
         double radius = Math.min(1.0, Math.sqrt(N) / 2.0);
+        //double radius = 500;
         double theta = 2 * Math.PI / N;
 
         for (int i = 0; i < N; i++) {
             double ix = radius * Math.cos(i * theta);
+            //double ix = radius * Math.cos((WIDTH_CENTER+i) * theta);
+            //double ix = radius * Math.cos(WIDTH_CENTER+(i * theta));
             double iy = radius * Math.sin(i * theta);
+            //double iy = radius * Math.sin((HEIGHT_CENTER+i) * theta);
+            //double iy = radius * Math.sin(HEIGHT_CENTER+(i * theta));
+
             for (int j = 0; j < N; j++) {
-                double jx = radius * Math.cos(i * theta);
-                double jy = radius * Math.sin(i * theta);
+
+                double jx = radius * Math.cos(j * theta);
+                //double jx = radius * Math.cos((WIDTH_CENTER+j) * theta);
+                //double jx = radius * Math.cos(WIDTH_CENTER+(j * theta));
+                double jy = radius * Math.sin(j * theta);
+                //double jy = radius * Math.sin((HEIGHT_CENTER+j) * theta);
+                //double jy = radius * Math.sin(HEIGHT_CENTER+(j * theta));
+
                 if (adj[i][j] == 1) {
-                    StdDraw.line(ix, iy, jx, jy);
+                    //StdDraw.line(ix, iy, jx, jy);
+                    StdDraw.line(ix+2, iy+2, jx+2, jy+2);
+                    //StdDraw.line(ix+3, iy+3, jx+3, jy+3);
+                    //StdDraw.line(ix+99, iy-99, jx+99, jy-99);
+                    //StdDraw.line(WIDTH_CENTER-ix, HEIGHT_CENTER-iy,WIDTH_CENTER-jx, HEIGHT_CENTER-jy);
                 }
+                StdDraw.setPenColor(StdDraw.RED);
+                StdDraw.point(jx+2 , jy+2);
+                //StdDraw.point(jx , jy);
+                StdDraw.setPenColor(StdDraw.WHITE);
             }
+
         }
         StdDraw.show();
     }
