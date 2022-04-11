@@ -1,6 +1,6 @@
 import edu.princeton.cs.algs4.Graph;
 
-//display a graph given a list of vertices and edges
+/*//display a graph given a list of vertices and edges
 public class UI {
 
     public static <Graph> void main(String[] args) {
@@ -61,4 +61,4 @@ public class UI {
     }
 }   //end of class
 
-
+*/
