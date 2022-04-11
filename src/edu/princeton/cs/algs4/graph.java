@@ -37,6 +37,9 @@
 package edu.princeton.cs.algs4;
 
 import java.util.NoSuchElementException;
+import java.util.Stack;
+//import Bag.Bag;
+
 
 /**
  *  The {@code Graph} class represents an undirected graph of vertices
@@ -247,12 +250,14 @@ public class Graph {
      * Unit tests the {@code Graph} data type.
      *
      * @param args the command-line arguments
+     *
+     * public static void main(String[] args) {
+     *         In in = new In(args[0]);
+     *         Graph G = new Graph(in);
+     *         StdOut.println(G);
+     *     }
      */
-    public static void main(String[] args) {
-        In in = new In(args[0]);
-        Graph G = new Graph(in);
-        StdOut.println(G);
-    }
+
 
 }
 
