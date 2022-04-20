@@ -1,8 +1,7 @@
 /*
-Created by maeroso at 01/12/2017.
+Adapted from maeroso's version
  */
 
-//package Dsatur;
 
 import java.io.*;
 import java.util.*;
@@ -12,44 +11,34 @@ public class Dsatur {
     static int mapSize;
 
     public static void main(String[] args) {
-        //LinkedHashMap<Integer, LinkedList<Integer>> map = Dsatur.read("graphtest");
         LinkedHashMap<Integer, LinkedList<Integer>> map = Dsatur.read("graphtest");
-        //mapSize = map.get(-1).get(0);
-
+        int colorNbr = 0;
         degreesArray = Dsatur.calculateVerticesDegrees(map);
         Map<Integer, Integer> resultingColor = new LinkedHashMap<>();
         List<Integer> coloredVertices = new ArrayList<>();
 
         int[] coloring = new int[mapSize];
-        for (int i = 0; i < mapSize; i++) {
-            coloring[i] = -1;
-        }
-        List<Integer> notColored = new ArrayList<>();
-        for (int i = 0; i < mapSize; i++) {
-            notColored.add(i);
-        }
+        int notColored = mapSize;
+        for (int i = 0; i < mapSize; i++) { coloring[i] = -1; }
 
         int highestDegreeVertex = Dsatur.getHighestDegreeVertex(degreesArray);
         coloring[highestDegreeVertex] = 0;
         coloredVertices.add(highestDegreeVertex);
         resultingColor.put(highestDegreeVertex, 0);
-        notColored.remove(highestDegreeVertex);
+        notColored -= 1;
 
-        while (notColored.size() > 0) {
-            int vertice = Dsatur.getHighestSaturation(map, coloring);
+        int lastColor = 0;
+        boolean[] availableColors = new boolean[mapSize];
+        int vertice = Dsatur.getHighestSaturation(map, coloring);
+        while (notColored > 0) {
             while (resultingColor.containsKey(vertice)) {
                 vertice = Dsatur.getHighestSaturation(map, coloring);
             }
-            boolean[] availableColors = new boolean[mapSize];
             for (int j = 0; j < mapSize; j++) {
                 availableColors[j] = true;
             }
-
-            int lastColor = 0;
             for (int currentVertex : coloredVertices) {
-                if (Dsatur.areAdjacent(map,
-                                        vertice,
-                                        currentVertex)) {
+                if (Dsatur.areAdjacent(map, vertice, currentVertex)) {
                     int color = resultingColor.get(currentVertex);
                     availableColors[color] = false;
                 }
@@ -60,30 +49,33 @@ public class Dsatur {
                     break;
                 }
             }
-            resultingColor.put(vertice,
-                                lastColor);
-            notColored.remove((Object) vertice);
+            resultingColor.put(vertice, lastColor);
+            notColored -= 1;
             coloredVertices.add(vertice);
             coloring[vertice] = lastColor;
+            System.out.println(notColored);
+            if (lastColor > colorNbr) { colorNbr = lastColor; }
         }
         System.out.println(resultingColor);
-        writeOutputCSV(resultingColor);
+        System.out.println(colorNbr+1);
     }
-
 
     public static int getHighestSaturation(LinkedHashMap<Integer, LinkedList<Integer>> graph, int[] coloring) {
         int maxSaturation = 0;
         int vertexWithMaxSaturation = 0;
+        Set<Integer> colors;
+        int tempSaturation;
 
         for (int i = 0; i < mapSize; i++) {
             if (coloring[i] == -1) {
-                Set<Integer> colors = new TreeSet<>();
+                colors = new TreeSet<>();
+                tempSaturation = 0;
                 for (int j = 0; j < mapSize; j++) {
                     if (Dsatur.areAdjacent(graph, i, j) && coloring[j] != -1) {
                         colors.add(coloring[j]);
+                        tempSaturation += 1;
                     }
                 }
-                int tempSaturation = colors.size();
                 if (tempSaturation > maxSaturation) {
                     maxSaturation = tempSaturation;
                     vertexWithMaxSaturation = i;
@@ -99,85 +91,33 @@ public class Dsatur {
         return graph.get(i).contains(j);
     }
 
-
     public static LinkedHashMap<Integer, LinkedList<Integer>> read(String csvFile) {
         String row;
-        String csvSeparator = " ";
         LinkedHashMap<Integer, LinkedList<Integer>> vertexMap = new LinkedHashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((row = br.readLine()) != null) {
-                String[] columns = row.split(csvSeparator);
+                String[] columns = row.split(" ");
                 int key = Integer.parseInt(columns[0]);
                 int val = Integer.parseInt(columns[1]);
-                if (mapSize == 0 && key == -2) {
-                    mapSize = val;
-                }
+                if (mapSize == 0 && key == -2) { mapSize = val; }
                 else {
-                    if (!vertexMap.containsKey(key)) {
-                        vertexMap.put(key, new LinkedList<>());
-                    }
-                    if (!vertexMap.containsKey(val)) {
-                        vertexMap.put(val, new LinkedList<>());
-                    }
-                    System.out.println(vertexMap);
-                    System.out.println(key);
-                    System.out.println(val);
+                    if (!vertexMap.containsKey(key)) { vertexMap.put(key, new LinkedList<>()); }
+                    if (!vertexMap.containsKey(val)) { vertexMap.put(val, new LinkedList<>()); }
                     vertexMap.get(key).add(val);
                     vertexMap.get(val).add(key);
                 }
-/*
-                for (int i = 0, columnsLength = columns.length; i < columnsLength; i++) {
-                    String column = columns[i].trim();
-                    if (i == 0) {
-                        continue;
-                    }
-                    int value = Integer.valueOf(column) - 1;
-                    vertexMap.get(vertexCount).add(value);
-                }
-                vertexCount++;*/
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(vertexMap);
+        } catch (IOException e) { e.printStackTrace(); }
+        System.out.println("file parsing done");
         return vertexMap;
     }
 
-    public static void writeOutputCSV(Map<Integer, Integer> coloracaoResultante) {
-        BufferedWriter bufferedWriter;
-
-        try {
-            FileWriter fileWriter = new FileWriter("output.csv");
-            bufferedWriter = new BufferedWriter(fileWriter);
-
-            bufferedWriter.append("Nó,Cor\n");
-
-            for (Map.Entry<Integer, Integer> integerEntry : coloracaoResultante.entrySet()) {
-                bufferedWriter.append(String.valueOf(integerEntry.getKey()))
-                        .append(",")
-                        .append(String.valueOf(integerEntry.getValue()))
-                        .append("\n");
-            }
-
-            bufferedWriter.close();
-
-            fileWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public static int[] calculateVerticesDegrees(LinkedHashMap<Integer, LinkedList<Integer>> m) {
         int[] degreeArray = new int[mapSize];
-
         for (Map.Entry<Integer, LinkedList<Integer>> listEntry : m.entrySet()) {
             int k = listEntry.getKey();
             int s = listEntry.getValue().size();
-
             degreeArray[k] = s;
         }
         return degreeArray;
@@ -185,12 +125,9 @@ public class Dsatur {
 
     public static int getHighestDegreeVertex(int[] degreeArray) {
         int highestDegVertexIndex = 0;
-
         for (int i = 0; i < degreeArray.length; i++) {
-            if (degreeArray[i] > degreeArray[highestDegVertexIndex])
-                highestDegVertexIndex = i;
+            if (degreeArray[i] > degreeArray[highestDegVertexIndex]) { highestDegVertexIndex = i; }
         }
-
         return highestDegVertexIndex;
     }
 }
