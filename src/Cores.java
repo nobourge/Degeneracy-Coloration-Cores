@@ -4,6 +4,7 @@
 * that are left after all vertices of degree less than k have been removed
 * */
 
+
 import edu.princeton.cs.algs4.Graph;
 
 import java.util.ArrayList;
@@ -163,7 +164,7 @@ public class Cores {
             {
                 degeneracy_reached = printKCores(k++, depthed);
             }
-            System.out.printf("\n input graph is %d -degenerate", k);
+            System.out.printf("\n input graph is %d -degenerate", k-1);
 
         }
 
