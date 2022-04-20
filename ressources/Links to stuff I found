@@ -5,7 +5,23 @@ https://www.google.com/amp/s/www.geeksforgeeks.org/find-k-cores-graph/amp/
 Pour le nbr chromatique, wikipédia en présente pas mal
 https://en.m.wikipedia.org/wiki/Graph_coloring
 
+Coloration : choisir entre Dsatur, welsh powell et RLF
+https://githubhot.com/repo/BasLaa/Graph-Coloring
 
+Dsatur :
+https://github.com/maeroso/dsatur-graph-algorithm/blob/master/src/Dsatur/Dsatur.java
+https://github.com/BasLaa/Graph-Coloring/blob/63aae9d26cb651b226e151bec9e2558136610ae7/DSaturBacktrack.java
++ finds best solution
+- slow but faster than greedy algo
+
+Welsh Powell :
+https://github.com/Ajaypal91/Graph_Coloring_Algorithms_Implementation
+https://github.com/BasLaa/Graph-Coloring/blob/8f8c865a5e6db4871b3fade10b8ca7ac6cb22105/WelshPowell.java
+
+RLF : 
+https://github.com/BasLaa/Graph-Coloring/blob/8f8c865a5e6db4871b3fade10b8ca7ac6cb22105/RLFn.java
++ fastest
+- harder
 
 
 
