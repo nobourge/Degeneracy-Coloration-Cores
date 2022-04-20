@@ -4,7 +4,7 @@
 
 import java.util.*;
 
-class GFG
+class Cores
 {
 
     // This class represents a undirected graph using adjacency

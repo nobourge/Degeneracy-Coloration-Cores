@@ -12,6 +12,7 @@ public class Dsatur {
     static int mapSize;
 
     public static void main(String[] args) {
+        //LinkedHashMap<Integer, LinkedList<Integer>> map = Dsatur.read("graphtest");
         LinkedHashMap<Integer, LinkedList<Integer>> map = Dsatur.read("graphtest");
         //mapSize = map.get(-1).get(0);
 
@@ -46,7 +47,9 @@ public class Dsatur {
 
             int lastColor = 0;
             for (int currentVertex : coloredVertices) {
-                if (Dsatur.areAdjacent(map, vertice, currentVertex)) {
+                if (Dsatur.areAdjacent(map,
+                                        vertice,
+                                        currentVertex)) {
                     int color = resultingColor.get(currentVertex);
                     availableColors[color] = false;
                 }
@@ -57,7 +60,8 @@ public class Dsatur {
                     break;
                 }
             }
-            resultingColor.put(vertice, lastColor);
+            resultingColor.put(vertice,
+                                lastColor);
             notColored.remove((Object) vertice);
             coloredVertices.add(vertice);
             coloring[vertice] = lastColor;

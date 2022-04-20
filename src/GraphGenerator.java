@@ -26,7 +26,7 @@ public class GraphGenerator {
     void main(String[] args) {
         Graph g = new Graph(10);
         //addEdges(g, "src/GraphGenerator.txt");
-        addEdges(g, "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt");
+        addEdges(g, "ressources/graph/SNAP/facebook/facebook_combined-coloration.txt/facebook_combined-coloration.txt");
         System.out.println(g);
     }
 }
