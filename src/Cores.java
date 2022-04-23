@@ -4,13 +4,11 @@
 * that are left after all vertices of degree less than k have been removed
 * */
 
-
+//import org.jgrapht.Graph;
 import edu.princeton.cs.algs4.Graph;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
+import java.io.File;
+import java.util.*;
 
 public class Cores {
 
@@ -39,6 +37,40 @@ public class Cores {
             this.adj[u].add(v);
             this.adj[v].add(u);
         }
+
+        // function to remove an edge from graph
+        void removeEdge(int u, int v)
+        {
+            this.adj[u].remove(v);
+            this.adj[v].remove(u);
+        }
+
+        void init_from_file(String file_name,
+                            String order)
+        {
+            int degeneracy = 0;
+
+            try
+            {
+                Scanner sc = new Scanner(new File(file_name));
+                int nb_edges = sc.nextInt();
+                if (order == "vertex")
+                {
+
+                    for (int i = 0; i < nb_edges; i++)
+                    {
+                        int u = sc.nextInt();
+                        int v = sc.nextInt();
+                        addEdge(u, v);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                System.out.println("Error while reading file");
+            }
+        }
+
 
         // A recursive function to print DFS starting from v.
         // It returns true if degree of v after processing is less
@@ -78,24 +110,24 @@ public class Cores {
             return (vDegree[v] < k);
         }
 
-        //todo: print k cores by vertice deletion
+        // removes vertices with degree less than k and adjaccent vertices
+
+        //boolean print_k_cores_by_vertice_deletion(int k)
+
 
         // Prints k cores of an undirected graph
-        boolean printKCores(int k, boolean[] depthed)
+        boolean printKCores(int k,
+                            int startvertex,
+                            int mindeg,
+                            boolean[] depthed,
+                            boolean degeneracy_reached)
         {
             // INITIALIZATION
             // Mark all the vertices as not visited and not
             // processed.
-            boolean degeneracy_reached = false;
+
             boolean[] visited = new boolean[V];
-            boolean[] processed = new boolean[V];
             Arrays.fill(visited, false);
-            Arrays.fill(processed, false);
-
-            int mindeg = Integer.MAX_VALUE;
-            int startvertex = 0;
-
-            int degeneracy = 0;
 
             // Store degrees of all vertices
             int[] vDegree = new int[V];
@@ -127,12 +159,14 @@ public class Cores {
                 if (vDegree[v] >= k)
                 {
                     System.out.printf("\n[%d]", v);
+                    System.out.printf("(: degree [%d])", vDegree[v]);
                     printed++;
 
                     // Traverse adjacency list of v and print only
                     // those adjacent which have vDegree >= k after
                     // BFS.
-                    boolean adj_printed = false;
+
+                    //boolean adj_printed = false;
 
                     for (int i : adj[v])
                         if (vDegree[i] >= k)
@@ -142,7 +176,7 @@ public class Cores {
                 else
                 {
                     if(!depthed[v]){
-                        System.out.printf("\n[%d] has depth [%d]", v, k-1);
+                        System.out.printf("\n[%d] (: degree [%d]) has depth [%d]", v, vDegree[v], k-1);
                         depthed[v] = true;
                     }
                 }
@@ -154,7 +188,8 @@ public class Cores {
         }
 
         // prints k cores for every k until degeneracy is reached
-        void printAllKCores()
+        void printAllKCores(int startvertex,
+                            int mindeg)
         {
             boolean[] depthed = new boolean[V];
             Arrays.fill(depthed, false);
@@ -162,7 +197,11 @@ public class Cores {
             boolean degeneracy_reached = false;
             while (!degeneracy_reached)
             {
-                degeneracy_reached = printKCores(k++, depthed);
+                degeneracy_reached = printKCores(k++,
+                                                startvertex,
+                                                mindeg,
+                                                depthed,
+                                                degeneracy_reached);
             }
             System.out.printf("\n input graph is %d -degenerate", k-1);
 
@@ -184,43 +223,15 @@ public class Cores {
     // Driver Code
     public static void main(String[] args)
     {
-        int k = 4;
+        //int k = 4;
         Graph g1 = new Graph(9);
-        g1.addEdge(0, 1);
-        g1.addEdge(0, 2);
-        g1.addEdge(1, 2);
-        g1.addEdge(1, 5);
-        g1.addEdge(2, 3);
-        g1.addEdge(2, 4);
-        g1.addEdge(2, 5);
-        g1.addEdge(2, 6);
-        g1.addEdge(3, 4);
-        g1.addEdge(3, 6);
-        g1.addEdge(3, 7);
-        g1.addEdge(4, 6);
-        g1.addEdge(4, 7);
-        g1.addEdge(5, 6);
-        g1.addEdge(5, 8);
-        g1.addEdge(6, 7);
-        g1.addEdge(6, 8);
-        g1.printAllKCores();
+        int mindeg = Integer.MAX_VALUE;
+        int startvertex = 0;
 
-        System.out.println();
+        g1.init_from_file("facebook_combined-graph.txt", "vertex");
+        g1.printAllKCores(startvertex,
+                mindeg);
 
-        Graph g2 = new Graph(13);
-        g2.addEdge(0, 1);
-        g2.addEdge(0, 2);
-        g2.addEdge(0, 3);
-        g2.addEdge(1, 4);
-        g2.addEdge(1, 5);
-        g2.addEdge(1, 6);
-        g2.addEdge(2, 7);
-        g2.addEdge(2, 8);
-        g2.addEdge(2, 9);
-        g2.addEdge(3, 10);
-        g2.addEdge(3, 11);
-        g2.addEdge(3, 12);
-        g2.printAllKCores();
     }
 
 }
