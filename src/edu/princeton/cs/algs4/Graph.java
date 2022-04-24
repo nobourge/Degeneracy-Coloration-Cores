@@ -74,7 +74,7 @@ import java.util.Stack;
 public class Graph {
     private static final String NEWLINE = System.getProperty("line.separator");
 
-    private final int V;
+    private int V;
     private int E;
     private Bag<Integer>[] adj;
 
@@ -158,6 +158,15 @@ public class Graph {
             for (int w : reverse) {
                 adj[v].add(w);
             }
+        }
+    }
+
+    public void setV(int value) {
+        if (V < 0) throw new IllegalArgumentException("Number of vertices must be non-negative");
+        this.V = value;
+        adj = (Bag<Integer>[]) new Bag[V];
+        for (int v = 0; v < V; v++) {
+            adj[v] = new Bag<Integer>();
         }
     }
 
