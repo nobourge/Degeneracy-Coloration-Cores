@@ -61,10 +61,13 @@ public class WFC {
                     chromaticNBR = -1;
                     resetAlgo();
                     M += 1;
+                    System.out.println("Restart with M = "+M);
                     break;
                 }
                 colorize(newOrigin, collapse(newOrigin), true);
                 propagate(G, newOrigin);
+                if (uncolored.size() % 1000 == 0) {
+                    System.out.println(uncolored.size()+" left. color used : "+chromaticNBR); }
             }
         }
         //System.out.println(coloration);
