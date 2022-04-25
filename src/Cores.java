@@ -6,7 +6,6 @@
 * */
 
 //import org.jgrapht.Graph;
-import JGraphT.Coreness;
 import edu.princeton.cs.algs4.Graph;
 import edu.princeton.cs.algs4.IndexMultiwayMinPQ;
 
@@ -273,7 +272,7 @@ public class Cores {
     //initialize the graph from file_name
     public static Graph initialize_Graph_from(String file_name)
     {
-        Graph g1;
+
         try {
             System.out.println("initialize_Graph_from input file: " + file_name);
 
@@ -284,16 +283,16 @@ public class Cores {
             System.out.println("V: " + V);
             System.out.println("E: " + E);
 
-            g1 = new Graph(V);
+            Graph g = new Graph(V);
 
             for (int i = 0; i < E; i++) {
                 int u = sc.nextInt();
                 int v = sc.nextInt();
-                g1.addEdge(u, v);
+                g.addEdge(u, v);
             }
 
             System.out.println("returning g1");
-            return g1;
+            return g;
         } catch (Exception e) {
             System.out.println("Error while reading file");
         }
@@ -302,12 +301,22 @@ public class Cores {
 
 
     /*
+     * @return the depths of the vertices in a graph
+     */
+    public static Map<Integer, Integer> getDepths(String file_name)
+    {
+
+        getDegeneracyAndDepths_from(file_name);
+        return depths;
+    }
+
+    /*
      * @return the depth of a vertex
      */
     public static Integer getVertexDepth(String file_name, int v)
     {
 
-        getDegeneracyAndDepths_from(file_name);
+        getDepths(file_name);
         return depths.get(v);
     }
 
@@ -327,7 +336,8 @@ public class Cores {
      */
     public static void getDegeneracyAndDepths_from(String file_name)
     {
-        Graph g = initialize_Graph_from(file_name);
+        //Graph g = initialize_Graph_from(file_name);
+        Graph g = GraphGenerator.generateGraph(file_name);
         System.out.println("Graph created");
 
         /*
@@ -415,23 +425,25 @@ public class Cores {
     // Driver Code
     public static void main(String[] args)
     {
+        //String file_name = "graphtest";
         //String file_name = "facebook_combined.txt";
-        String file_name = "facebook_combined_for_cores.txt";
-        String order = "vertex";
+        //String file_name = "facebook_combined_for_cores.txt";
+        //String file_name = "roadNet-PA.txt";
+        String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
 
 
         getDegeneracyAndDepths_from(file_name);
+
         /*
-        degeneracy = getDegeneracy(file_name);
+
+        int degeneracy = getDegeneracy(file_name);
 
         System.out.println("Degeneracy: " + degeneracy);
 
         int depth_of_5 = getVertexDepth(file_name, 5);
         System.out.println("Depth of 5: " + depth_of_5);
 
-
          */
-
 
     }
 
