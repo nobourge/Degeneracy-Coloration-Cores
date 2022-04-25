@@ -6,19 +6,17 @@ import edu.princeton.cs.algs4.Graph;
 
 public class WFC {
 
-    static int chromaticNBR = 0;
+    static int chromaticNBR = -1;
     static int M=0;
-    static LinkedList<Integer> L;
+    static LinkedList<Integer> L = new LinkedList<>();
     static Map<Integer, Integer> coloration = new LinkedHashMap<>();
-    static List<Integer>[] domain = null;
+    static LinkedList<Integer>[] domain = new LinkedList[]{};
     static List<Integer> uncolored = new ArrayList<>();
 
     public static void main(String[] args) {
-
         if (args.length == 2) {
-            Graph G = GraphGenerator.generateGraph(args[1], args[2]);
+            Graph G = GraphGenerator.generateGraph(args[0], args[1]);
             solve(G);
-
         }
         else {
             String filename = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
@@ -26,7 +24,6 @@ public class WFC {
             Graph G = GraphGenerator.generateGraph(filename, delimiter);
             System.out.println("solving...");
             solve(G);
-
         }
     }
 
@@ -34,13 +31,11 @@ public class WFC {
         M = 0;
         L.clear();
         coloration = new LinkedHashMap<>();
-        domain = null;
         uncolored = new ArrayList<>();
     }
 
     public static void initAlgo(Graph G) {
-        for (int i=0; i<M; i++) { L.add(i); }
-
+        domain = new LinkedList[G.V()];
         int origin=0;
         for (int i=0; i<G.V(); i++) {
             int degree = G.degree(i);
@@ -48,42 +43,46 @@ public class WFC {
                 M = degree;
                 origin = i;
             }
-            domain[i] = L;
             uncolored.add(i);
         }
-        colorize(origin, M);
+        for (int i=0; i<M; i++) { L.add(i); }
+        for (int i=0; i<G.V(); i++) { domain[i] = (LinkedList<Integer>) L.clone(); }
+
+        colorize(origin, collapse(origin), true);
         propagate(G, origin);
     }
 
     public static int solve(Graph G) {
-        while(chromaticNBR != -1) {
+        while(chromaticNBR == -1) {
             initAlgo(G);
-            while (uncolored.size() > 0) {
+            while (!uncolored.isEmpty()) {
                 int newOrigin = observe();
                 if (newOrigin == -1) {
                     chromaticNBR = -1;
                     resetAlgo();
+                    M += 1;
                     break;
                 }
-                colorize(newOrigin, collapse(newOrigin));
+                colorize(newOrigin, collapse(newOrigin), true);
                 propagate(G, newOrigin);
             }
         }
-        System.out.println(coloration);
+        //System.out.println(coloration);
         System.out.println(chromaticNBR);
+        resetAlgo();
         return chromaticNBR;
     }
 
-    public static void colorize(int v, int color) {
+    public static void colorize(int v, int color, boolean overwrite) {
         coloration.put(v, color);
         uncolored.remove(Integer.valueOf(v));
         chromaticNBR = Math.max(chromaticNBR, color);
+
+        if (overwrite) { domain[v].removeIf(n -> (n != color)); }
     }
 
     public static int observe() {
-        int lowestEntropy = M;
-        int lowestVertex = 0;
-        int curr_entropy;
+        int lowestEntropy = M; int lowestVertex = 0; int curr_entropy;
         for (int vertex: uncolored) {
             curr_entropy = entropy(vertex);
             if (curr_entropy < lowestEntropy) {
@@ -91,10 +90,7 @@ public class WFC {
                 lowestVertex = vertex;
             }
         }
-        if (lowestEntropy == 0) {
-            M += 1;
-            lowestVertex = -1;
-        }
+        if (lowestEntropy == 0) { lowestVertex = -1; }
         return lowestVertex;
     }
 
@@ -106,8 +102,8 @@ public class WFC {
             propagationOrigin = notPropagated.pop();
             for (int neigh: G.adj(propagationOrigin)) {
                 if (entropy(neigh) > 1) { domain[neigh].remove(Integer.valueOf(color(propagationOrigin))); }
-                if (entropy(neigh) == 1) {
-                    colorize(neigh, collapse(neigh));
+                if (entropy(neigh) == 1 && !coloration.containsKey(neigh)) {
+                    colorize(neigh, collapse(neigh), false);
                     notPropagated.add(neigh);
                 }
         }   }

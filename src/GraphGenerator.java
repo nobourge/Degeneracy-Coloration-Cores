@@ -5,8 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class GraphGenerator {
-
-        //given a txt file containing edges, adds them to the graph
+    //given a txt file containing edges, adds them to the graph
     public static void addEdges(Graph g, String filename, String delimiter) {
         try {
             Scanner in = new Scanner(new File(filename));
@@ -31,10 +30,7 @@ public class GraphGenerator {
                 String[] tokens = line.split(delimiter);
                 g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
             }
-
-
-
-            } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("File not found");
         }
     }
