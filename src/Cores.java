@@ -303,20 +303,24 @@ public class Cores {
     /*
      * @return the depths of the vertices in a graph
      */
-    public static Map<Integer, Integer> getDepths(String file_name)
+    public static Map<Integer, Integer> getDepths(String file_name,
+                                                  String delimiter)
     {
 
-        getDegeneracyAndDepths_from(file_name);
+        getDegeneracyAndDepths_from(file_name,
+                delimiter);
         return depths;
     }
 
     /*
      * @return the depth of a vertex
      */
-    public static Integer getVertexDepth(String file_name, int v)
+    public static Integer getVertexDepth(String file_name,
+                                         String delimiter,
+                                         int v)
     {
 
-        getDepths(file_name);
+        getDepths(file_name, delimiter);
         return depths.get(v);
     }
 
@@ -324,20 +328,20 @@ public class Cores {
     /*
     * @return the degeneracy of a graph
      */
-    public static int getDegeneracy(String file_name)
+    public static int getDegeneracy(String file_name, String delimiter)
     {
 
-        getDegeneracyAndDepths_from(file_name);
+        getDegeneracyAndDepths_from(file_name, delimiter);
         return degeneracy;
     }
 
     /*
     calculates the degeneracy of a graph and its vertices depths
      */
-    public static void getDegeneracyAndDepths_from(String file_name)
+    public static void getDegeneracyAndDepths_from(String file_name, String delimiter)
     {
         //Graph g = initialize_Graph_from(file_name);
-        Graph g = GraphGenerator.generateGraph(file_name);
+        Graph g = GraphGenerator.generateGraph(file_name, delimiter);
         System.out.println("Graph created");
 
         /*
@@ -425,14 +429,13 @@ public class Cores {
     // Driver Code
     public static void main(String[] args)
     {
-        //String file_name = "graphtest";
-        //String file_name = "facebook_combined.txt";
-        //String file_name = "facebook_combined_for_cores.txt";
-        //String file_name = "roadNet-PA.txt";
+        //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";
+        //String delimiter = " ";
+
         String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
+        String delimiter = "\t";
 
-
-        getDegeneracyAndDepths_from(file_name);
+        getDegeneracyAndDepths_from(file_name, delimiter);
 
         /*
 

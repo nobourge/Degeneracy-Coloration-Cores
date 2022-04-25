@@ -15,6 +15,19 @@ public class WFC {
 
     public static void main(String[] args) {
 
+        if (args.length == 2) {
+            Graph G = GraphGenerator.generateGraph(args[1], args[2]);
+            solve(G);
+
+        }
+        else {
+            String filename = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
+            String delimiter = "\t";
+            Graph G = GraphGenerator.generateGraph(filename, delimiter);
+            System.out.println("solving...");
+            solve(G);
+
+        }
     }
 
     public static void resetAlgo() {
