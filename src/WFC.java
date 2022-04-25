@@ -19,9 +19,11 @@ public class WFC {
             solve(G);
         }
         else {
-            String filename = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
-            String delimiter = "\t";
-            Graph G = GraphGenerator.generateGraph(filename, delimiter);
+            String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
+
+            //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
+            Graph G = GraphGenerator.generateGraph(file_name, delimiter);
+            System.out.println("G.V() : " + G.V());
             System.out.println("solving...");
             solve(G);
         }

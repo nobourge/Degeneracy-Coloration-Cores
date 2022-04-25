@@ -375,18 +375,19 @@ public class Cores {
         Map<Integer, Integer> depths = new HashMap<>();
 
         int maxDegree = g.V() - 1;
-        int minDegree = g.V(); // todo int.MAX_VALUE;
+
         Set[] degreeIndexedPriorityQueue = (Set[]) Array.newInstance(Set.class, maxDegree + 1);
+
         for (int i = 0; i < degreeIndexedPriorityQueue.length; i++) {
             degreeIndexedPriorityQueue[i] = new HashSet<>();
         }
 
-
-        Map<Integer, Integer> degrees = new HashMap<>();
+        int minDegree = g.V(); // todo int.MAX_VALUE;
+        Map<Integer, Integer> degreesMap = new HashMap<>();
         for (int v = 0 ; v < g.V() ; v++) {
             int d = g.degree(v);
             degreeIndexedPriorityQueue[d].add(v);
-            degrees.put(v, d);
+            degreesMap.put(v, d);
             minDegree = Math.min(minDegree, d);
         }
 
@@ -394,8 +395,10 @@ public class Cores {
          * Extract from degreeIndexedPriorityQueue
          */
         while (minDegree < g.V()) {
+            // minimum degree is smaller than the number of vertices
             Set minDegreeKey = degreeIndexedPriorityQueue[minDegree];
             if (minDegreeKey.isEmpty()) {
+                //System.out.println("minDegreeKey of degree " + minDegree + " is empty");
                 minDegree++;
                 continue;
             }
@@ -406,12 +409,17 @@ public class Cores {
             degeneracy = Math.max(degeneracy, minDegree);
 
             for (int u : g.adj(vertex_to_remove)) {
-                int uDegree = degrees.get(u);
-                if (uDegree > minDegree && !depths.containsKey(u)) {
+                int uDegree = degreesMap.get(u);
+
+                if (minDegree < uDegree && !depths.containsKey(u)) { // O(1)
                     degreeIndexedPriorityQueue[uDegree].remove(u);
                     uDegree--;
-                    degrees.put(u, uDegree);
+                    // update u Degree in degreesMap
+                    degreesMap.put(u, uDegree);
+                    // update u position in degreeIndexedPriorityQueue
                     degreeIndexedPriorityQueue[uDegree].add(u);
+
+                    //update minDegree
                     minDegree = Math.min(minDegree, uDegree);
                 }
             }
@@ -428,11 +436,9 @@ public class Cores {
     // Driver Code
     public static void main(String[] args)
     {
-        //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";
-        //String delimiter = " ";
+        String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
 
-        String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
-        String delimiter = "\t";
+        //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
 
         getDegeneracyAndDepths_from(file_name, delimiter);
 

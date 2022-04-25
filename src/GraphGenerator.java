@@ -11,16 +11,13 @@ public class GraphGenerator {
             Scanner in = new Scanner(new File(filename));
             for (int i = 0; i < 2; i++) {
                 String line = in.nextLine();
-                //String[] tokens = line.split(delimiter);
                 String[] tokens = line.split(delimiter);
                 if (strToInt(tokens[0]) == -1) {
                     g.setV(strToInt(tokens[1]));
                 }
-
                 else if (strToInt(tokens[0]) == -2) {
                     int E = strToInt(tokens[1]);
                 }
-
                 else {
                     g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
                 }
