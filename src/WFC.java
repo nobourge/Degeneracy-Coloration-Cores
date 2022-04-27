@@ -10,7 +10,7 @@ public class WFC {
     static int M=0;
     static LinkedList<Integer> L = new LinkedList<>();
     static Map<Integer, Integer> coloration = new LinkedHashMap<>();
-    static LinkedList<Integer>[] domain = new LinkedList[]{};
+    static LinkedList<Integer>[] entropy = new LinkedList[]{};
     static List<Integer> uncolored = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -19,11 +19,19 @@ public class WFC {
             solve(G);
         }
         else {
-            String filename = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
-            String delimiter = "\t";
+            //String filename = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
+            //String filename = "Email-EuAll.txt";
+            //String delimiter = "\t";
+            String filename = "idk.csv";
+            String delimiter = " ";
+            //String filename = "src/musae_FR_edges.csv";
+            //String delimiter = ",";
             Graph G = GraphGenerator.generateGraph(filename, delimiter);
             System.out.println("solving...");
+            long start2 = System.currentTimeMillis();
             solve(G);
+            long end2 = System.currentTimeMillis();
+            System.out.println("Elapsed Time in milli seconds: "+ (end2-start2));
         }
     }
 
@@ -35,7 +43,7 @@ public class WFC {
     }
 
     public static void initAlgo(Graph G) {
-        domain = new LinkedList[G.V()];
+        entropy = new LinkedList[G.V()];
         int origin=0;
         for (int i=0; i<G.V(); i++) {
             int degree = G.degree(i);
@@ -46,7 +54,7 @@ public class WFC {
             uncolored.add(i);
         }
         for (int i=0; i<M; i++) { L.add(i); }
-        for (int i=0; i<G.V(); i++) { domain[i] = (LinkedList<Integer>) L.clone(); }
+        for (int i=0; i<G.V(); i++) { entropy[i] = new LinkedList<>(); }
 
         colorize(origin, collapse(origin), true);
         propagate(G, origin);
@@ -81,19 +89,19 @@ public class WFC {
         uncolored.remove(Integer.valueOf(v));
         chromaticNBR = Math.max(chromaticNBR, color);
 
-        if (overwrite) { domain[v].removeIf(n -> (n != color)); }
+        //if (overwrite) { domain[v].removeIf(n -> (n != color)); }
     }
 
     public static int observe() {
-        int lowestEntropy = M; int lowestVertex = 0; int curr_entropy;
+        int lowestEntropy = -1; int lowestVertex = -1; int curr_entropy;
         for (int vertex: uncolored) {
             curr_entropy = entropy(vertex);
-            if (curr_entropy < lowestEntropy) {
+            if (curr_entropy > lowestEntropy) {
                 lowestEntropy = curr_entropy;
                 lowestVertex = vertex;
             }
         }
-        if (lowestEntropy == 0) { lowestVertex = -1; }
+        if (lowestEntropy == M) { lowestVertex = -1; }
         return lowestVertex;
     }
 
@@ -103,18 +111,30 @@ public class WFC {
         int propagationOrigin;
         while (!notPropagated.isEmpty()) {
             propagationOrigin = notPropagated.pop();
+            int colorOrigin = color(propagationOrigin);
             for (int neigh: G.adj(propagationOrigin)) {
-                if (entropy(neigh) > 1) { domain[neigh].remove(Integer.valueOf(color(propagationOrigin))); }
-                if (entropy(neigh) == 1 && !coloration.containsKey(neigh)) {
-                    colorize(neigh, collapse(neigh), false);
-                    notPropagated.add(neigh);
+                //if (entropy(neigh) > 1) { domain[neigh].remove(Integer.valueOf(color(propagationOrigin))); }
+                if (!coloration.containsKey(neigh)) {
+                    if (entropy(neigh) < M-1) {
+                        entropy[neigh].add(colorOrigin); }
+                    if (entropy(neigh) == M-1) {
+                        colorize(neigh, collapse(neigh), false);
+                        notPropagated.add(neigh);
+                    }
                 }
         }   }
     }
 
-    public static int entropy(int v) { return domain[v].size(); }
+    public static int entropy(int v) { return entropy[v].size(); }
 
     public static int color(int v) { return coloration.get(v); }
 
-    public static int collapse(int v) { return domain[v].get(0); }
+    public static int collapse(int v) //{ return domain[v].get(0); }
+    {
+        for (int i=0; i<M; i++) {
+            if (!entropy[v].contains(i)) {
+                return i; }
+        }
+        return -1;
+    }
 }
