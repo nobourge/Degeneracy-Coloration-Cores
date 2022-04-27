@@ -1,3 +1,15 @@
+\RequirePackage{filecontents}
+
+\begin{filecontents}{\jobname.bib}
+@misc{snapnets,
+author       = {Jure Leskovec and Andrej Krevl},
+title        = {{SNAP Datasets}: {Stanford} Large Network Dataset Collection},
+howpublished = {\url{http://snap.stanford.edu/data}},
+month        = jun,
+year         = 2014
+}
+\end{filecontents}
+
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -20,7 +32,13 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{comment}
+
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{algpseudocode}
+
 \usepackage{adjustbox}
+
 
 
 \newcommand*{\MyIncludeGraphicsMaxSize}[2][]{%
@@ -56,19 +74,91 @@
 \section{Introduction}
 
 \newpage
-
 \section{Degénérescence}
+
 \subsection{Introduction}
+\href{https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)}{https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)}
+
+
+Matula and Beck (1983) outline an algorithm to derive the degeneracy ordering of a graph
+{\displaystyle G=(V,E)}
+
 \subsection{algorithme}
+\begin{algorithmic}[1]
+
+\State $L \gets $init
+
+\For{vertex v in G}
+\State $d_v \gets $adj[v]
+\Comment{Compute a number dv for each vertex v in G, the number of neighbors of v that are not already in L.Initially, these numbers are just the degrees of the vertices.}
+\EndFor
+
+\State $D \gets array$
+
+\For{vertex v in G}
+\State $D[i] \gets d_v$
+\Comment{Initialize an array D such that D[i] contains a list of the vertices v that are not already in L for which dv = i.}
+\EndFor
+
+
+Initialize k to 0.
+\State $k \gets 0$
+
+
+\While{D[i] is empty}
+\State $i \gets +1$
+\Comment{Scan the array cells D[0], D[1], ... until finding an i for which D[i] is nonempty.}
+
+
+\State $k \gets max(k,i)$
+\Comment{Set k to max(k,i)}
+
+\State $v \gets D[i]$
+\Comment{Select a vertex v from D[i]. }
+
+\State $L \gets v$
+\Comment{Add v to the beginning of L and remove it from D[i].}
+
+\Comment{For each neighbor w of v not already in L:}
+\Comment{subtract one from dw}
+\Comment{move w to the cell of D corresponding to the new value of dw.}
+
+
+\EndWhile
+
+\end{algorithmic}
+
 \subsubsection{Description}
 \subsubsection{Complexité}
+Temps : {\displaystyle {\mathcal {O}}(\vert V\vert +\vert E\vert )}
+
+Espace : {\displaystyle 2\vert E\vert +{\mathcal {O}}(\vert V\vert )}
+
 \subsubsection{Mise en oeuvre en Java }
+
+\begin{figure}[H]
+\begin{minipage}{\textwidth}
+  \centering
+	%\lstinputlisting{./code/}
+  \label{fig:m}
+\end{minipage}
+\end{figure}
 
 \newpage
 
 \section{Coloration}
 \subsection{Introduction}
 \subsection{algorithme}
+\begin{algorithmic}
+\State $i \gets 10$
+\If{$i\geq 5$}
+    \State $i \gets i-1$
+\Else
+    \If{$i\leq 3$}
+        \State $i \gets i+2$
+    \EndIf
+\EndIf
+\end{algorithmic}
 \subsubsection{Description}
 \subsubsection{Complexité}
 \subsubsection{Mise en oeuvre en Java }
@@ -78,35 +168,75 @@
 \section{Degénérescence et Cœurs }
 \subsection{Introduction}
 \subsection{algorithme}
+\begin{algorithmic}
+\State $i \gets 10$
+\If{$i\geq 5$}
+    \State $i \gets i-1$
+\Else
+    \If{$i\leq 3$}
+        \State $i \gets i+2$
+    \EndIf
+\EndIf
+\end{algorithmic}
 \subsubsection{Description}
 \subsubsection{Complexité}
 \subsubsection{Mise en oeuvre en Java }
 
 \newpage
 
-\section{Experiences sur des graphes issus de données réelles }
+\section{Expériences sur des graphes issus de données réelles }
 
 \subsection{Ressources }
+
+\cite{snapnets}
+\bibliographystyle{otago}
+\bibliography{\jobname}
+
 \href{https://snap.stanford.edu/data/.}{https://snap.stanford.edu/data/.}
 
 \subsection{Graphes }
-\begin{itemize}
-    \item 1
-    \begin{itemize}
-        \item dégénérescence
-        \item colorabilité
-        \item cœurs
-        \end{itemize}
+\subsubsection{ego-facebook}
+This dataset consists of 'circles' (or 'friends lists') from Facebook. Facebook data was collected from survey participants using this Facebook app. The dataset includes node features (profiles), circles, and ego networks.
+\href{https://snap.stanford.edu/data/ego-Facebook.html
+}{https://snap.stanford.edu/data/ego-Facebook.html
+}
 
-    \item 2
-    \begin{itemize}
-        \item dégénérescence
-        \item colorabilité
-        \item cœurs
-    \end{itemize}
+
+\begin{figure}[H]
+  \centering
+	\includegraphics[scale=0.8]{img/graph/.png}
+  \label{fig:logo}
+\end{figure}
+
+
+\subsubsection{Road networks}
+Intersections and endpoints are represented by nodes, and the roads connecting these intersections or endpoints are represented by undirected edges.
+
+\begin{itemize}
+    \item roadNet-PA : Pennsylvania.
+    \item roadNet-CA : California.
 \end{itemize}
 
+\subsection{Expériences }
+CCM : coefficient de connexion moyen
+\begin{align}
+
+\begin{tabular}{|c|c|c|c|c|c|c|
+                |c|c|c|c|c|c|c|}
+\hline
+graphe & nœuds & arêtes & CCM  & dégénérescence & colorabilité & timer \\
+\hline
+
+ego-facebook & 4039 & 88234 & 0.6055 & 115 &  & 400277800 \\
+roadNet-PA & 1088092 & 1541898 & 0.0465 & 6 &  & 764869138100   \\
+roadNet-CA & 1971281 & 5533214 & 0.0464 & 6 &  & 1092788984600   \\
+
+\hline
+\end{tabular}
+\end{align}
 \newpage
+
+
 
 \section{Ressources}
 \underlined{(cf. énoncé)}

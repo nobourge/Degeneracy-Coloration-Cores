@@ -342,17 +342,11 @@ public class Cores {
      */
     public static void getDegeneracyAndDepths_from(String file_name, String delimiter)
     {
+        System.out.println("File name: " + file_name);
         System.out.println("Graph Vertices quantity : " + GraphGenerator.getV(file_name, delimiter));
 
         Graph g = GraphGenerator.generateGraph(file_name, delimiter);
         System.out.println("Graph created");
-
-        /*
-        Coreness JgraphTc = new Coreness();
-        System.out.println("JgraphT Degeneracy : " + JgraphTc.getDegeneracy());
-
-
-         */
 
         /*
         //IndexMultiwayMinPQ<Integer> pq = initialize_IndexMultiwayMinPQ_from(file_name, order, g1);
@@ -429,7 +423,7 @@ public class Cores {
             }
         }
         System.out.println("degeneracy: " + degeneracy);
-        System.out.println("depths: " + depths);
+        //System.out.println("depths: " + depths);
         //System.out.println("depth of 5: " + depths.get(5));
         //System.out.println("minDegree: " + minDegree);
 
@@ -440,10 +434,11 @@ public class Cores {
     // Driver Code
     public static void main(String[] args)
     {
-        String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
+        //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
 
-        //String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
         //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
+        String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
+
 
         long start1 = System.nanoTime();
         getDegeneracyAndDepths_from(file_name, delimiter);
