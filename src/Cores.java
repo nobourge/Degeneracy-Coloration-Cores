@@ -12,6 +12,9 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import java.time.Duration;
+import java.time.Instant;
+
 public class Cores {
     private Graph g;
 
@@ -339,16 +342,11 @@ public class Cores {
      */
     public static void getDegeneracyAndDepths_from(String file_name, String delimiter)
     {
-        //Graph g = initialize_Graph_from(file_name);
+        System.out.println("File name: " + file_name);
+        System.out.println("Graph Vertices quantity : " + GraphGenerator.getV(file_name, delimiter));
+
         Graph g = GraphGenerator.generateGraph(file_name, delimiter);
         System.out.println("Graph created");
-
-        /*
-        Coreness JgraphTc = new Coreness();
-        System.out.println("JgraphT Degeneracy : " + JgraphTc.getDegeneracy());
-
-
-         */
 
         /*
         //IndexMultiwayMinPQ<Integer> pq = initialize_IndexMultiwayMinPQ_from(file_name, order, g1);
@@ -375,18 +373,19 @@ public class Cores {
         Map<Integer, Integer> depths = new HashMap<>();
 
         int maxDegree = g.V() - 1;
-        int minDegree = g.V(); // todo int.MAX_VALUE;
+
         Set[] degreeIndexedPriorityQueue = (Set[]) Array.newInstance(Set.class, maxDegree + 1);
+
         for (int i = 0; i < degreeIndexedPriorityQueue.length; i++) {
             degreeIndexedPriorityQueue[i] = new HashSet<>();
         }
 
-
-        Map<Integer, Integer> degrees = new HashMap<>();
+        int minDegree = g.V(); // todo int.MAX_VALUE;
+        Map<Integer, Integer> degreesMap = new HashMap<>();
         for (int v = 0 ; v < g.V() ; v++) {
             int d = g.degree(v);
             degreeIndexedPriorityQueue[d].add(v);
-            degrees.put(v, d);
+            degreesMap.put(v, d);
             minDegree = Math.min(minDegree, d);
         }
 
@@ -394,8 +393,10 @@ public class Cores {
          * Extract from degreeIndexedPriorityQueue
          */
         while (minDegree < g.V()) {
+            // minimum degree is smaller than the number of vertices
             Set minDegreeKey = degreeIndexedPriorityQueue[minDegree];
             if (minDegreeKey.isEmpty()) {
+                //System.out.println("minDegreeKey of degree " + minDegree + " is empty");
                 minDegree++;
                 continue;
             }
@@ -406,19 +407,24 @@ public class Cores {
             degeneracy = Math.max(degeneracy, minDegree);
 
             for (int u : g.adj(vertex_to_remove)) {
-                int uDegree = degrees.get(u);
-                if (uDegree > minDegree && !depths.containsKey(u)) {
+                int uDegree = degreesMap.get(u);
+
+                if (minDegree < uDegree && !depths.containsKey(u)) { // O(1)
                     degreeIndexedPriorityQueue[uDegree].remove(u);
                     uDegree--;
-                    degrees.put(u, uDegree);
+                    // update u Degree in degreesMap
+                    degreesMap.put(u, uDegree);
+                    // update u position in degreeIndexedPriorityQueue
                     degreeIndexedPriorityQueue[uDegree].add(u);
+
+                    //update minDegree
                     minDegree = Math.min(minDegree, uDegree);
                 }
             }
         }
         System.out.println("degeneracy: " + degeneracy);
         //System.out.println("depths: " + depths);
-        System.out.println("depth of 5: " + depths.get(5));
+        //System.out.println("depth of 5: " + depths.get(5));
         //System.out.println("minDegree: " + minDegree);
 
 
@@ -428,25 +434,22 @@ public class Cores {
     // Driver Code
     public static void main(String[] args)
     {
-        //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";
-        //String delimiter = " ";
+        //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
 
-        String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";
-        String delimiter = "\t";
+        //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
+        String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
 
+
+        long start1 = System.nanoTime();
         getDegeneracyAndDepths_from(file_name, delimiter);
-
+        long end1 = System.nanoTime();
+        System.out.println("Elapsed Time in nano seconds: "+ (end1-start1));
         /*
-
         int degeneracy = getDegeneracy(file_name);
-
         System.out.println("Degeneracy: " + degeneracy);
 
         int depth_of_5 = getVertexDepth(file_name, 5);
         System.out.println("Depth of 5: " + depth_of_5);
-
          */
-
     }
-
 }
