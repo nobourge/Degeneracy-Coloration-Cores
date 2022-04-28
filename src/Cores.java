@@ -6,15 +6,9 @@
 
 //import org.jgrapht.Graph;
 import edu.princeton.cs.algs4.Graph;
-import edu.princeton.cs.algs4.IndexMultiwayMinPQ;
 
-import java.io.File;
 import java.lang.reflect.Array;
 import java.util.*;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Cores {
     private Graph g;
@@ -23,342 +17,49 @@ public class Cores {
 
     static int degeneracy = 0;
 
-    /*
 
-    // A recursive function to print DFS starting from v.
-    // It returns true if degree of v after processing is less
-    // than k else false
-    // It also updates degree of adjacent if degree of v
-    // is less than k.
-    // And if degree of a processed adjacent
-    // becomes less than k, then it reduces of degree of v also
-
-    boolean DFSUtil(Graph g
-                    int v,
-                    boolean[] visited,
-                    int[] vDegree,
-                    int k)
-    {
-
-        // Mark the current node as visited and print it
-        visited[v] = true;
-
-        // Recur for all the vertices adjacent to this vertex
-        for (int i : adj[v])
-        {
-            if (vDegree[v] < k)
-                // degree of v is less than k
-                // degree of adjacent must be reduced
-                vDegree[i]--;
-
-            // If adjacent is not processed, process it
-            if (!visited[i])
-            {
-                // If degree of adjacent after processing becomes
-                // less than k, then reduce degree of v also.
-                DFSUtil(i, visited, vDegree, k);
-            }
-        }
-
-        // Return true if degree of v is less than k
-        return (vDegree[v] < k);
-    }
-
-     */
-
-    // removes vertices with degree less than k and adjaccent vertices
-
-    //boolean print_k_cores_by_vertice_deletion(int k)
-
-
-    /*
-    // Prints k cores of an undirected graph
-    boolean printKCores(Graph g,
-                        int k,
-                        int startvertex,
-                        int mindeg,
-                        boolean[] depthed,
-                        boolean degeneracy_reached)
-    {
-        int V = g.V();
-        // INITIALIZATION
-        // Mark all the vertices as not visited and not
-        // processed.
-
-        boolean[] visited = new boolean[V];
-        Arrays.fill(visited, false);
-
-        // Store degrees of all vertices
-        int[] vDegree = new int[V];
-        for (int i = 0; i < V; i++)
-        {
-            vDegree[i] = g.adj[i].size();
-
-            if (vDegree[i] < mindeg)
-            {
-                mindeg = vDegree[i];
-                startvertex = i;
-            }
-        }
-        DFSUtil(startvertex, visited, vDegree, k);
-
-        // DFS traversal to update degrees of all
-        // vertices.
-        for (int i = 0; i < V; i++)
-            if (!visited[i])
-                DFSUtil(i, visited, vDegree, k);
-
-        // PRINTING K CORES
-        System.out.printf("\n\n[%d] -Cores : ", k);
-        int printed = 0;
-        for (int v = 0; v < V; v++)
-        {
-            // Only considering those vertices which have degree
-            // >= K after BFS
-            if (vDegree[v] >= k)
-            {
-                System.out.printf("\n[%d]", v);
-                System.out.printf("(: degree [%d])", vDegree[v]);
-                printed++;
-
-                // Traverse adjacency list of v and print only
-                // those adjacent which have vDegree >= k after
-                // BFS.
-
-                //boolean adj_printed = false;
-
-                for (int i : g.adj[v])
-                    if (vDegree[i] >= k)
-                        System.out.printf(" -> %d", i);
-                        boolean printed_adj = true;
-            }
-            else
-            {
-                if(!depthed[v]){
-                    System.out.printf("\n[%d] (: degree [%d]) has depth [%d]", v, vDegree[v], k-1);
-                    depthed[v] = true;
-                }
-            }
-        }
-        if (printed == 0){
-        degeneracy_reached = true;}
-
-        return degeneracy_reached;
-    }
-
-     */
-
-    /*
-    // prints k cores for every k until degeneracy is reached
-    void printAllKCores(Graph g,
-                        int startvertex,
-                        int mindeg)
-    {
-        boolean[] depthed = new boolean[g.V()];
-        Arrays.fill(depthed, false);
-        int k=0;
-        boolean degeneracy_reached = false;
-        while (!degeneracy_reached)
-        {
-            degeneracy_reached = printKCores(g,
-                                            k++,
-                                            startvertex,
-                                            mindeg,
-                                            depthed,
-                                            degeneracy_reached);
-        }
-        System.out.printf("\n input graph is %d -degenerate", k-1);
-
-    }
-
-     */
-
-    /*
-    //For a vertex v of G,
-    // we can define its depth c(v)
-    // as the largest number k such that v belongs to a k-core.
-    void print_depths_of_vertices_of(Graph g)
-     */
-
-
-
-    //initialize the IndexMultiwayMinPQ from graph
-    public static IndexMultiwayMinPQ<Integer>
-    initialize_IndexMultiwayMinPQ_from_graph(Graph g) {
-        IndexMultiwayMinPQ<Integer> pq = new IndexMultiwayMinPQ<Integer>(g.V(), g.E() - 1);
-
-        for (int i = 0; i < g.V(); i++) {
-            //pq.insert(i, g.adj(i));
-        }
-        return pq;
-    }
-
-    /*
-    //initialize the IndexMultiwayMinPQ from file_name
-    public static IndexMultiwayMinPQ<Integer>
-    initialize_IndexMultiwayMinPQ_from(String file_name,
-                                       String order,
-                                       Graph g1)
-                                       //IndexMultiwayMinPQ<Integer> pq)
-    {
-        IndexMultiwayMinPQ<Integer> pq;
-        try {
-            System.out.println("initialize_IndexMultiwayMinPQ_from input file: " + file_name);
-
-            Scanner sc = new Scanner(new File(file_name));
-            System.out.println("Reading file...");
-            int V = sc.nextInt();
-            int E = sc.nextInt();
-            System.out.println("V: " + V);
-            System.out.println("E: " + E);
-
-
-            //pq = new IndexMultiwayMinPQ<Integer>(V, 2);
-            pq = new IndexMultiwayMinPQ<Integer>(V, E - 1);
-            if (order.equals("vertex")) {
-                System.out.println("order: vertex");
-
-                int u = sc.nextInt();
-                int v = sc.nextInt();
-                System.out.println("u: " + u);
-                System.out.println("v: " + v);
-
-                g1.addEdge(u, v);
-
-                int current_u = u;
-                int position_map_index = 0;
-
-
-                for (int i = 0; i < E-1; i++) {
-
-                    u = sc.nextInt();
-                    v = sc.nextInt();
-
-                    //System.out.println("u: " + u);
-                    //System.out.println("v: " + v);
-
-                    g1.addEdge(u, v);
-                    //System.out.println("g1.adj["+u+"]: " + g1.adj[u]);
-
-                    if (u != current_u) {
-                        //System.out.println("current_u: " + current_u);
-                        System.out.println("g1.adj["+current_u+"]: " + g1.adj[current_u]);
-                        System.out.println("inserting size " + g1.adj[current_u].size() + " of " + current_u + " at " + position_map_index + " into pq");
-                        pq.insert(position_map_index, g1.adj[current_u].size());
-                        current_u = u;
-                        //System.out.println("current_u: " + current_u);
-
-                        position_map_index++;
-
-                        //System.out.println("position_map_index: " + position_map_index);
-                        g1.addEdge(u, v);
-                    }
-                }
-                pq.insert(position_map_index, g1.adj[current_u].size());
-                System.out.println("inserting size " + g1.adj[current_u].size() + " of " + current_u + " at " + position_map_index + " into pq");
-
-
-                System.out.println("returning pq");
-                return pq;
-            }
-            System.out.println("returning pq");
-            return pq;
-        } catch (Exception e) {
-            System.out.println("Error while reading file");
-        }
-        return null;
-        //return pq;
-    }
-
-     */
-
-    //initialize the graph from file_name
-    public static Graph initialize_Graph_from(String file_name)
-    {
-
-        try {
-            System.out.println("initialize_Graph_from input file: " + file_name);
-
-            Scanner sc = new Scanner(new File(file_name));
-            System.out.println("Reading file...");
-            int V = sc.nextInt();
-            int E = sc.nextInt();
-            System.out.println("V: " + V);
-            System.out.println("E: " + E);
-
-            Graph g = new Graph(V);
-
-            for (int i = 0; i < E; i++) {
-                int u = sc.nextInt();
-                int v = sc.nextInt();
-                g.addEdge(u, v);
-            }
-
-            System.out.println("returning g1");
-            return g;
-        } catch (Exception e) {
-            System.out.println("Error while reading file");
-        }
-        return null;
-    }
-
-
-    /*
+    /*For a vertex v of G,
+     we can define its depth c(v)
+     as the largest number k such that v belongs to a k-core.
      * @return the depths of the vertices in a graph
      */
-    public static Map<Integer, Integer> getDepths(String file_name,
-                                                  String delimiter)
-    {
-
-        getDegeneracyAndDepths_from(file_name,
-                delimiter);
-        return depths;
-    }
 
     /*
      * @return the depth of a vertex
      */
-    public static Integer getVertexDepth(String file_name,
-                                         String delimiter,
+    public static Integer getVertexDepth(Graph g,
                                          int v)
     {
-
-        getDepths(file_name, delimiter);
+        getDepths(g);
         return depths.get(v);
     }
 
-
-    /*
-    * @return the degeneracy of a graph
-     */
-    public static int getDegeneracy(String file_name, String delimiter)
+    //from depths, returns a map of each dephs to the number of vertices at that depth, the k-cores sizes
+    public static Map<Integer, Integer> getKCoreSizes(Graph g)
     {
-
-        getDegeneracyAndDepths_from(file_name, delimiter);
-        return degeneracy;
+        Map<Integer, Integer> depths = getDepths(g);
+        Map<Integer, Integer> k_cores_sizes = new HashMap<>();
+        for (int depth : depths.values()) {
+            if (k_cores_sizes.containsKey(depth)) {
+                k_cores_sizes.put(depth, k_cores_sizes.get(depth) + 1);
+            } else {
+                k_cores_sizes.put(depth, 1);
+            }
+        }
+        return k_cores_sizes;
     }
 
     /*
     calculates the degeneracy of a graph and its vertices depths
      */
-    public static void getDegeneracyAndDepths_from(String file_name, String delimiter)
+    public static Map<Integer, Integer> getDepths(Graph g)
     {
-        System.out.println("File name: " + file_name);
-        System.out.println("Graph Vertices quantity : " + GraphGenerator.getV(file_name, delimiter));
-
-        Graph g = GraphGenerator.generateGraph(file_name, delimiter);
-        System.out.println("Graph created");
-
-        int degeneracy = 0;
-
         Map<Integer, Integer> depths = new HashMap<>();
-
         int maxDegree = g.V() - 1;
 
         //ConcurrentSkipListSet[] degreeIndexedPriorityQueue = (ConcurrentSkipListSet[]) Array.newInstance(ConcurrentSkipListSet.class, maxDegree + 1);
         TreeSet[] degreeIndexedPriorityQueue = (TreeSet[]) Array.newInstance(TreeSet.class, maxDegree + 1);
         //IndexMultiwayMinPQ<TreeSet> degreeIndexedPriorityQueue = new IndexMultiwayMinPQ<>(g.V(), g.E() - 1);
-
 
         for (int i = 0; i < degreeIndexedPriorityQueue.length; i++) {
         //for (int i = 0; i < degreeIndexedPriorityQueue.size(); i++) {
@@ -366,8 +67,7 @@ public class Cores {
             degreeIndexedPriorityQueue[i] = new TreeSet<>();
             //degreeIndexedPriorityQueue.insert(i, new TreeSet<>());
         }
-
-        int minDegree = g.V(); // todo int.MAX_VALUE;
+        int minDegree = g.V();
         Map<Integer, Integer> degreesMap = new HashMap<>();
         for (int v = 0 ; v < g.V() ; v++) {
             int d = g.degree(v);
@@ -397,8 +97,6 @@ public class Cores {
             minDegreeKey.remove(vertex_to_remove);
             //remove the vertex from the hashset O(1)
             depths.put(vertex_to_remove, minDegree);
-            degeneracy = Math.max(degeneracy, minDegree);
-
             for (int u : g.adj(vertex_to_remove)) {
                 int uDegree = degreesMap.get(u);
 
@@ -415,35 +113,46 @@ public class Cores {
                 }
             }
         }
-        System.out.println("degeneracy: " + degeneracy);
-        //System.out.println("depths: " + depths);
-        //System.out.println("depth of 5: " + depths.get(5));
-        //System.out.println("minDegree: " + minDegree);
+        return depths;
     }
+
+    // from a given filename, returns the graph degeneracy, vertices depths and k-cores sizes
+    // todo
 
 
     // Driver Code
     public static void main(String[] args)
     {
-        //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
-        //String file_name = "ressources/graph/SNAP/facebook_combined.txt/com-LiveJournal.txt";String delimiter = " ";
+        Graph g;
+        Map<Integer, Integer> depths = new HashMap<>();
+        Map<Integer, Integer> kCoresSizes = new HashMap<>();
+        if (args.length == 2) {
+            g = GraphGenerator.generateGraph(args[0], args[1]);
 
+        }
+        else {
 
-        String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
-        //String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
+            String file_name = "graphtest";String delimiter = " ";
+            //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
+            //String file_name = "ressources/graph/SNAP/facebook_combined.txt/com-LiveJournal.txt";String delimiter = " ";
+            //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
+            //String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
+            //String file_name = "ressources/graph/SNAP/com-friendster.ungraph.txt";String delimiter = "\t";
 
-
-
+            g = GraphGenerator.generateGraph(file_name, delimiter);
+        }
         long start1 = System.nanoTime();
-        getDegeneracyAndDepths_from(file_name, delimiter);
-        long end1 = System.nanoTime();
-        System.out.println("Elapsed Time in nano seconds: "+ (end1-start1));
-        /*
-        int degeneracy = getDegeneracy(file_name);
-        System.out.println("Degeneracy: " + degeneracy);
+        depths = getDepths(g);
+        //int vdepth = getVertexDepth(g,5);
+        //kCoresSizes = getKCoreSizes(g);
 
-        int depth_of_5 = getVertexDepth(file_name, 5);
-        System.out.println("Depth of 5: " + depth_of_5);
-         */
+        long end1 = System.nanoTime();
+
+        System.out.println("Elapsed Time in nano seconds: " + (end1 - start1));
+
+        System.out.println("depths: " + depths);
+        //System.out.println("Vertex depth: " + vdepth);
+        //System.out.println(kCoresSizes);
+
     }
 }
