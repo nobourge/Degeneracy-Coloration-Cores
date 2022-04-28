@@ -14,6 +14,7 @@ import java.util.*;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Cores {
     private Graph g;
@@ -348,36 +349,22 @@ public class Cores {
         Graph g = GraphGenerator.generateGraph(file_name, delimiter);
         System.out.println("Graph created");
 
-        /*
-        //IndexMultiwayMinPQ<Integer> pq = initialize_IndexMultiwayMinPQ_from(file_name, order, g1);
-        IndexMultiwayMinPQ<Integer> pq = initialize_IndexMultiwayMinPQ_from_graph(g1);
-        System.out.println("pq initialized");
-        assert pq != null;
-        System.out.println("pq.size(): " + pq.size());
-        assert pq != null;
-        System.out.println(pq.size());
-
-        while (!pq.isEmpty())
-        {
-            int u = pq.delMin();
-            if (g1.adj[u].size() < mindeg)
-            {
-                mindeg = g1.adj[u].size();
-                startvertex = u;
-            }
-        }
-         */
-
         int degeneracy = 0;
 
         Map<Integer, Integer> depths = new HashMap<>();
 
         int maxDegree = g.V() - 1;
 
-        Set[] degreeIndexedPriorityQueue = (Set[]) Array.newInstance(Set.class, maxDegree + 1);
+        //ConcurrentSkipListSet[] degreeIndexedPriorityQueue = (ConcurrentSkipListSet[]) Array.newInstance(ConcurrentSkipListSet.class, maxDegree + 1);
+        TreeSet[] degreeIndexedPriorityQueue = (TreeSet[]) Array.newInstance(TreeSet.class, maxDegree + 1);
+        //IndexMultiwayMinPQ<TreeSet> degreeIndexedPriorityQueue = new IndexMultiwayMinPQ<>(g.V(), g.E() - 1);
+
 
         for (int i = 0; i < degreeIndexedPriorityQueue.length; i++) {
-            degreeIndexedPriorityQueue[i] = new HashSet<>();
+        //for (int i = 0; i < degreeIndexedPriorityQueue.size(); i++) {
+            //degreeIndexedPriorityQueue[i] = new ConcurrentSkipListSet<>();
+            degreeIndexedPriorityQueue[i] = new TreeSet<>();
+            //degreeIndexedPriorityQueue.insert(i, new TreeSet<>());
         }
 
         int minDegree = g.V(); // todo int.MAX_VALUE;
@@ -385,6 +372,7 @@ public class Cores {
         for (int v = 0 ; v < g.V() ; v++) {
             int d = g.degree(v);
             degreeIndexedPriorityQueue[d].add(v);
+            //degreeIndexedPriorityQueue.keyOf(d).add(v);
             degreesMap.put(v, d);
             minDegree = Math.min(minDegree, d);
         }
@@ -393,16 +381,21 @@ public class Cores {
          * Extract from degreeIndexedPriorityQueue
          */
         while (minDegree < g.V()) {
-            // minimum degree is smaller than the number of vertices
-            Set minDegreeKey = degreeIndexedPriorityQueue[minDegree];
+            /// minimum degree is smaller than the number of vertices
+            //ConcurrentSkipListSet<Integer> minDegreeKey = degreeIndexedPriorityQueue[minDegree];
+            TreeSet<Integer> minDegreeKey = degreeIndexedPriorityQueue[minDegree];
+            //TreeSet<Integer> minDegreeKey = degreeIndexedPriorityQueue.minKey();
+
             if (minDegreeKey.isEmpty()) {
                 //System.out.println("minDegreeKey of degree " + minDegree + " is empty");
                 minDegree++;
                 continue;
             }
 
-            int vertex_to_remove = (int) minDegreeKey.iterator().next();
+            int vertex_to_remove = minDegreeKey.first();
+            // remove the vertex from the set O(log(n))
             minDegreeKey.remove(vertex_to_remove);
+            //remove the vertex from the hashset O(1)
             depths.put(vertex_to_remove, minDegree);
             degeneracy = Math.max(degeneracy, minDegree);
 
@@ -412,12 +405,12 @@ public class Cores {
                 if (minDegree < uDegree && !depths.containsKey(u)) { // O(1)
                     degreeIndexedPriorityQueue[uDegree].remove(u);
                     uDegree--;
-                    // update u Degree in degreesMap
+                    //// update u Degree in degreesMap
                     degreesMap.put(u, uDegree);
-                    // update u position in degreeIndexedPriorityQueue
+                    /// update u position in degreeIndexedPriorityQueue
                     degreeIndexedPriorityQueue[uDegree].add(u);
 
-                    //update minDegree
+                    ///update minDegree
                     minDegree = Math.min(minDegree, uDegree);
                 }
             }
@@ -426,8 +419,6 @@ public class Cores {
         //System.out.println("depths: " + depths);
         //System.out.println("depth of 5: " + depths.get(5));
         //System.out.println("minDegree: " + minDegree);
-
-
     }
 
 
@@ -435,9 +426,12 @@ public class Cores {
     public static void main(String[] args)
     {
         //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
+        //String file_name = "ressources/graph/SNAP/facebook_combined.txt/com-LiveJournal.txt";String delimiter = " ";
 
-        //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
-        String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
+
+        String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
+        //String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
+
 
 
         long start1 = System.nanoTime();
