@@ -9,7 +9,8 @@ public class GraphGenerator {
     public static void addEdges(Graph g, String filename, String delimiter) {
         try {
             Scanner in = new Scanner(new File(filename));
-            for (int i = 0; i < 2; i++) {
+            //for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 4; i++) {
                 String line = in.nextLine();
                 String[] tokens = line.split(delimiter);
                 if (strToInt(tokens[0]) == -1) {
@@ -17,6 +18,13 @@ public class GraphGenerator {
                 }
                 else if (strToInt(tokens[0]) == -2) {
                     int E = strToInt(tokens[1]);
+                }
+                //if token[1] is "Nodes:"
+                else if (tokens[1].equals("Nodes:")) {
+                    g.setV(strToInt(tokens[2]));
+                }
+                else if (tokens[0].equals("#")) {
+                    continue;
                 }
                 else {
                     g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
@@ -76,8 +84,12 @@ public class GraphGenerator {
 
     //generates graph from file
     public static Graph generateGraph(String filename, String delimiter) {
+        System.out.println("File name: " + filename);
+        System.out.println("Graph Vertices quantity : " + GraphGenerator.getV(filename, delimiter));
         Graph g = new Graph(0);
         addEdges(g, filename, delimiter);
+        System.out.println("Graph created");
+
         return g;
     }
 
