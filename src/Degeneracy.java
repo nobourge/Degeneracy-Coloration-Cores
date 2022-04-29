@@ -21,23 +21,18 @@ public class Degeneracy {
         Map<Integer, Integer> depths = new HashMap<>();
         int maxDegree = g.V() - 1;
 
-        //ConcurrentSkipListSet[] degreeIndexedPriorityQueue = (ConcurrentSkipListSet[]) Array.newInstance(ConcurrentSkipListSet.class, maxDegree + 1);
         TreeSet[] degreeIndexedPriorityQueue = (TreeSet[]) Array.newInstance(TreeSet.class, maxDegree + 1);
-        //IndexMultiwayMinPQ<TreeSet> degreeIndexedPriorityQueue = new IndexMultiwayMinPQ<>(g.V(), g.E() - 1);
-
 
         for (int i = 0; i < degreeIndexedPriorityQueue.length; i++) {
-            //for (int i = 0; i < degreeIndexedPriorityQueue.size(); i++) {
-            //degreeIndexedPriorityQueue[i] = new ConcurrentSkipListSet<>();
             degreeIndexedPriorityQueue[i] = new TreeSet<>();
-            //degreeIndexedPriorityQueue.insert(i, new TreeSet<>());
         }
+        System.out.println("degreeIndexedPriorityQueue.length: " + degreeIndexedPriorityQueue.length);
+        System.out.println(" initialized with TreeSets");
         int minDegree = g.V();
         Map<Integer, Integer> degreesMap = new HashMap<>();
         for (int v = 0 ; v < g.V() ; v++) {
             int d = g.degree(v);
             degreeIndexedPriorityQueue[d].add(v);
-            //degreeIndexedPriorityQueue.keyOf(d).add(v);
             degreesMap.put(v, d);
             minDegree = Math.min(minDegree, d);
         }
@@ -46,37 +41,37 @@ public class Degeneracy {
          */
         while (minDegree < g.V()) {
             /// minimum degree is smaller than the number of vertices
-            //ConcurrentSkipListSet<Integer> minDegreeKey = degreeIndexedPriorityQueue[minDegree];
             TreeSet<Integer> minDegreeKey = degreeIndexedPriorityQueue[minDegree];
-            //TreeSet<Integer> minDegreeKey = degreeIndexedPriorityQueue.minKey();
             if (minDegreeKey.isEmpty()) {
                 //System.out.println("minDegreeKey of degree " + minDegree + " is empty");
                 minDegree++;
                 continue;
             }
             int vertex_to_remove = minDegreeKey.first();
-            /// remove the vertex from the set O(log(n))
+            /// remove the vertex from the TreeSet O(log(n))
             minDegreeKey.remove(vertex_to_remove);
-            /// remove the vertex from the hashset O(1)
+            /// put the min degree at hashset vertex_to_remove index  O(1)
             depths.put(vertex_to_remove, minDegree);
             degeneracy = Math.max(degeneracy, minDegree);
 
             for (int u : g.adj(vertex_to_remove)) {
                 int uDegree = degreesMap.get(u);
+                /// verify if the minDegree is smaller than the degree of u O(1) and if u is not already in the TreeSet O(log(n))
                 if (minDegree < uDegree && !depths.containsKey(u)) { // O(1)
+                    /// remove the vertex from the TreeSet O(log(n))
                     degreeIndexedPriorityQueue[uDegree].remove(u);
                     uDegree--;
-                    //// update u Degree in degreesMap
+                    //// update u Degree in degreesMap O(1)
                     degreesMap.put(u, uDegree);
-                    /// update u position in degreeIndexedPriorityQueue
+                    /// update u position in degreeIndexedPriorityQueue O(log(n))
                     degreeIndexedPriorityQueue[uDegree].add(u);
 
-                    ///update minDegree
+                    ///update minDegree if necessary O(1)
                     minDegree = Math.min(minDegree, uDegree);
                 }
             }
         }
-        return degeneracy;
+        return degeneracy; // O(V+E)
     }
 
     public static void main(String[] args) {
