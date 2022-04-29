@@ -19,20 +19,16 @@ public class GraphGenerator {
                     if (tokens[0].equals("#")) {
                         continue;
                     }
-                    /*
+
                     else if (strToInt(tokens[0]) == -1) {
                         g.setV(strToInt(tokens[1]));
                     }
                     else if (strToInt(tokens[0]) == -2) {
                         int E = strToInt(tokens[1]);
                     }
-
-                     */
-                    //if token[1] is "Nodes:"
                     else if (tokens[1].equals("Nodes:")) {
                         g.setV(strToInt(tokens[2]));
                     }
-
                     else {
                         g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
                     }

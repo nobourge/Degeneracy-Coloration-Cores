@@ -132,9 +132,9 @@ public class Cores {
         }
         else {
 
-            String file_name = "graphtest";String delimiter = " ";
-            //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
-            //String file_name = "ressources/graph/SNAP/facebook_combined.txt/com-LiveJournal.txt";String delimiter = " ";
+            //String file_name = "graphtest";String delimiter = " ";
+            String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
+            //String file_name = "ressources/graph/SNAP/com-LiveJournal.txt";String delimiter = " ";
             //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
             //String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
             //String file_name = "ressources/graph/SNAP/com-friendster.ungraph.txt";String delimiter = "\t";
