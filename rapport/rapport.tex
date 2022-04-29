@@ -46,6 +46,9 @@ year         = 2014
     \includegraphics[#1]{#2}%
 \end{adjustbox}
 }
+\usepackage{array,booktabs,ragged2e}
+\newcolumntype{R}[1]{>{\RaggedLeft\arraybackslash}p{#1}}
+\newcolumntype{D}[1]{>{\RaggedLeft\arraybackslash}p{#1}}
 
 % -----------------------------------------------------
 % -----------------------------------------------------
@@ -73,17 +76,34 @@ year         = 2014
 
 \section{Introduction}
 
+Ce projet consiste en la réalisation et l'étude de 3 tâches relatives aux graphes : le calcul de leur dégénérescence, leur colorisation (et donc le calcul de leur nombre chromatique) et le calcul de la profondeur des sommets. Pour se faire, nous avons implémenté plusieurs algorithmes dans le langage JAVA.
+
+Ce rapport a pour but de présenter et expliquer les différents algorithmes utilisés pour la résolution de ces tâches, de comparer leurs complexités à des bornes inférieures et de montrer les résultats de nos tests de ces algorithmes sur de grands graphes issus de données réelles provenant du site de Stanford University.
+
+
+
+
+
+
+
+
+
 \newpage
 \section{Degénérescence}
 
 \subsection{Introduction}
+cf.énoncé:
+Dans ce qui suit, on considérera des graphes non-dirigés, simples et sans boucle. Un sous-graphe d’un tel graphe G est un graphe obtenu en supprimant certains sommets et certaines arêtes de G. Un graphe G est dit k-dégénéré si pour tout sous-graphe de G, y compris G lui-même, il existe un sommet de degré au plus k. La dégénérescence d’un graphe est le plus petit nombre k tel que le graphe est k-dégénéré
+
+
 \href{https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)}{https://en.wikipedia.org/wiki/Degeneracy_(graph_theory)}
 
+\subsection{algorithme}
+\label{sec:Degenerescence_algorithme}
 
 Matula and Beck (1983) outline an algorithm to derive the degeneracy ordering of a graph
-{\displaystyle G=(V,E)}
+{\displaystyle G=(V,E)} :
 
-\subsection{algorithme}
 \begin{algorithmic}[1]
 
 \State $L \gets $init
@@ -129,58 +149,279 @@ Initialize k to 0.
 \end{algorithmic}
 
 \subsubsection{Description}
+
+
 \subsubsection{Complexité}
-Temps : {\displaystyle {\mathcal {O}}(\vert V\vert +\vert E\vert )}
+\label{sec:Degénérescence_complexité}
 
-Espace : {\displaystyle 2\vert E\vert +{\mathcal {O}}(\vert V\vert )}
+Temps :
+\begin{itemize}
+    \item Borne inférieure :
+    \Omega{\displaystyle (\vert V\vert +\vert E\vert )}
 
+    \item Pire cas :
+    {\displaystyle {\mathcal {O}}(\vert V\vert +\vert E\vert )}
+
+\end{itemize}
+
+
+
+Espace :
+\begin{itemize}
+    \item Borne inférieure :
+    $\Omega{\displaystyle (\vert V\vert +\vert E\vert )}$
+
+    \item Pire cas :
+    {\displaystyle 2\vert E\vert +{\mathcal {O}}(\vert V\vert )}
+
+\end{itemize}
 \subsubsection{Mise en oeuvre en Java }
+La méthode \texttt{getDegeneracy()} est inspirée de la librairie JGraphT, classe Coreness.java, méthode  \texttt{lazyRun()}.
 
-\begin{figure}[H]
-\begin{minipage}{\textwidth}
-  \centering
-	%\lstinputlisting{./code/}
-  \label{fig:m}
-\end{minipage}
-\end{figure}
+
+see : \href{https://github.com/jgrapht/jgrapht/blob/master/jgrapht-core/src/main/java/org/jgrapht/alg/scoring/Coreness.java}{https://github.com/jgrapht/jgrapht/blob/master/jgrapht-core/src/main/java/org/jgrapht/alg/scoring/Coreness.java}
+
+Lors d'une discussion avec Anton Romanova, nous avons, via l'utilisation de l'outil "IntelliJ IDEA profiler", constaté que l'exécution était ralentie par la méthode iterator().next() appelée à chaque assignation d'un nouveau sommet à retirer sur les \texttt{Set} de sommets de même degré.
+En remplaçant les \texttt{Set} par des \texttt{Treeset} dont la structure de données est un arbre rouge-noir et \texttt{iterator().next()}  par \texttt{first()}, nous avons, par exemple, fait passer l'exécution sur un graphe à 1 971 281 nœuds et 5 533 214 arêtes de 18 minutes à 2 secondes.
+
+see : \href{https://www.jetbrains.com/help/idea/run-with-profiler.html}{https://www.jetbrains.com/help/idea/run-with-profiler.html}
+
+Nous commençons par initialiser la dégénérescence à 0, si le graphe contient 1 ou 2 sommets, c'est la valeur qui sera retournée. \\
+Un dictionnaire des sommets et leur profondeur, nommé "L" dans l'algorithme de Matula and Beck, contiendra les sommets ayant été virtuellement retirés du graphe. \\
+Les graphes traités étant sans boucle, le degré maximum est logiquement initialisé à V-1. \\
+Nous initialisons ensuite degreeIndexedPriorityQueue sous la forme d'une liste de \texttt{TreeSet}. \\
+Le degré minimum, inititialisé au nombre de sommets, sera réduit par la suite.
+Une "carte" des sommets et leur degré sera également d'une grande aide, celle-ci est donc inititialisée sous la forme d'une ... \texttt{"Map"}. \\
+Chaque sommet est ensuite stocké dans le TreeSet d'index correspondant à son degré et le degré minimum est reduit au degré du sommet de degré minimum.
+
+\begin{lstlisting}[language=java]
+public static int getDegeneracy(Graph g){
+        int degeneracy = 0;
+        Map<Integer, Integer> depths = new HashMap<>();
+        int maxDegree = g.V() - 1;
+
+        TreeSet[] degreeIndexedPriorityQueue = (TreeSet[]) Array.newInstance(TreeSet.class, maxDegree + 1);
+
+        for (int i = 0; i < degreeIndexedPriorityQueue.length; i++) {
+            degreeIndexedPriorityQueue[i] = new TreeSet<>();
+        }
+
+        int minDegree = g.V();
+        Map<Integer, Integer> degreesMap = new HashMap<>();
+        for (int v = 0 ; v < g.V() ; v++) {
+            int d = g.degree(v);
+            degreeIndexedPriorityQueue[d].add(v);
+            degreesMap.put(v, d);
+            minDegree = Math.min(minDegree, d);
+        }
+\end{lstlisting}
+Tant que le degré minimum est inférieur à la quantité de sommets, tant qu'un Treeset contenant au moins un sommet n'est pas trouvé, le degré minimum est augmenté de 1. \\
+Le premier sommet de degré minimum trouvé est supprimé du TreeSet, la carte des profondeurs et la dégénérescence sont mises à jours. \\
+Pour chaque sommet adjascent à celui retiré, si son degré est supérieur au degré minimum et qu'il n'a pas déjà été virtuellement retiré, sa position et son degré sont mis à jour.
+La recherche du sommet de degré minimum recommence alors.
+\begin{lstlisting}[language=java]
+        /*
+         * Extract from degreeIndexedPriorityQueue
+         */
+        while (minDegree < g.V()) {
+            /// minimum degree is smaller than the number of vertices
+            TreeSet<Integer> minDegreeKey = degreeIndexedPriorityQueue[minDegree];
+            if (minDegreeKey.isEmpty()) {
+                minDegree++;
+                continue;
+            }
+            int vertex_to_remove = minDegreeKey.first();
+            /// remove the vertex from the TreeSet O(log(n))
+            minDegreeKey.remove(vertex_to_remove);
+            /// put the min degree at hashset vertex_to_remove index  O(1)
+            depths.put(vertex_to_remove, minDegree);
+            degeneracy = Math.max(degeneracy, minDegree);
+
+            for (int u : g.adj(vertex_to_remove)) {
+                int uDegree = degreesMap.get(u);
+                /// verify if the minDegree is smaller than the degree of u O(1) and if u is not already in the TreeSet O(log(n))
+                if (minDegree < uDegree && !depths.containsKey(u)) { // O(1)
+                    /// remove the vertex from the TreeSet O(log(n))
+                    degreeIndexedPriorityQueue[uDegree].remove(u);
+                    uDegree--;
+                    //// update u Degree in degreesMap O(1)
+                    degreesMap.put(u, uDegree);
+                    /// update u position in degreeIndexedPriorityQueue O(log(n))
+                    degreeIndexedPriorityQueue[uDegree].add(u);
+
+                    ///update minDegree if necessary O(1)
+                    minDegree = Math.min(minDegree, uDegree);
+                }
+            }
+        }
+        return degeneracy; // O(V+E)
+    }
+\end{lstlisting}
 
 \newpage
 
 \section{Coloration}
 \subsection{Introduction}
-\subsection{algorithme}
-\begin{algorithmic}
-\State $i \gets 10$
-\If{$i\geq 5$}
-    \State $i \gets i-1$
-\Else
-    \If{$i\leq 3$}
-        \State $i \gets i+2$
-    \EndIf
-\EndIf
-\end{algorithmic}
+
+L'algorithme Wave Function Collapse est à l'origine un des meilleurs algorithmes utilisés pour la génération procédurale de terrain dans les jeux vidéos. Mais ses applications vont de la génération de texture à la résolution de sudoku, et nous avons choisi d'utiliser une de ses variantes : le Wave Function Collapse Coloring (WFC-C) pour la coloration de graphe.
+
+WFC-C est un algorithme gourmand qui est capable de minimiser les conficts de couleurs, et ainsi le besoin d'utiliser des couleurs supplémentaires, pour atteindre un nombre chromatique très proche du minimum possible. Il est en théorie extrêmement plus performant et précis que la plupart des autres algorithmes de coloration.
+
 \subsubsection{Description}
+
+L'idée derrière la façon dont fonctionne WFC tient ses origines dans la physique quantique, et plus précisément, la superposition quantique. Chaque sommet du graphe possède une superposition de couleurs possibles. Quand la couleur d'un de ces sommets est observée, c'est-à-dire déterminée, l'information se propage aux sommets voisins qui voient leur domaines de couleurs possibles diminuer à leur tour, ce qui rend possible une coloration en cascade.
+
+Il est impossible de connaître à l'avance le domaine des couleurs possibles, étant donné que le nombre chromatique du graphe fait partie de la réponse. Mais nous pouvons l'estimer en utilisant le théorème de Brook qui dit que si un graphe G avec un degré maximum m (m >2) ne contient aucun sous-graphe étant des (m+1)-graphes complets, alors le nombre chromatique de G est au maximum m. \\
+Ainsi, nous pouvons initialiser dans notre algorithme le domaine M des couleurs possibles comme étant le degré maximum du graphe G. Dans la description de l'algorithme qui suit, nous définissons l'entropie d'un sommet comme étant le nombre de couleurs avec lesquelles on ne peut pas colorier ce sommet. Si l'entropie d'un sommet atteint la valeur de M, la coloration est impossible : il faut ajouter une nouvelle couleur et recommencer l'algorithme.
+
+Pour éviter au maximum ce genre de cas, il est nécéssaire de commencer la coloration par le sommet qui a le plus haut degré. La première couleur lui est attribuée et l'information est propagée à ses voisins.
+\\
+\begin{lstlisting}[language=java]
+    public static void initAlgo(Graph G) {
+        entropy = new LinkedList[G.V()];
+        int origin=0;
+        for (int i=0; i<G.V(); i++) {
+            int degree = G.degree(i);
+            if (degree > M) {
+                M = degree;
+                origin = i;
+            }
+            uncolored.add(i);
+            entropy[i] = new LinkedList<>();
+        }
+        colorize(origin, collapse(origin));
+        propagate(origin);
+    }
+\end{lstlisting}
+
+Colorize() colorie un sommet avec le résultat de la fonction collapse() qui renvoie la plus petite couleur disponible dans le domaine du sommet.
+
+\begin{lstlisting}[language=java]
+    public static int collapse(int v) {
+        for (int i=0; i<M; i++) {
+            if (!entropy[v].contains(i)) { return i; }
+        }
+        return -1;
+    }
+\end{lstlisting}
+
+Propagate() propage l'information aux sommets environnants. Leur entropie augmente car une couleur de moins leur est accessible. S'ils n'ont plus qu'une couleur disponible, cette couleur leur est attribuée et cette nouvelle information est propagée à son tour.
+
+
+\begin{lstlisting}[language=java]
+    public static void propagate(int v) {
+        Stack<Integer> notPropagated = new Stack<>();
+        notPropagated.add(v);
+        int propagationOrigin;
+        while (!notPropagated.isEmpty()) {
+            propagationOrigin = notPropagated.pop();
+            int colorOrigin = color(propagationOrigin);
+            for (int neigh: G.adj(propagationOrigin)) {
+                if (!coloration.containsKey(neigh)) {
+                    if (entropy(neigh) < M-1) { entropy[neigh].add(colorOrigin); }
+                    if (entropy(neigh) == M-1) {
+                        colorize(neigh, collapse(neigh));
+                        notPropagated.add(neigh);
+                    }
+                }
+            }
+        }
+    }
+\end{lstlisting}
+
+Une fois que la propagation s'est terminée, l'algorithme entre dans sa boucle principale : tant qu'il reste des sommets non colorés, le sommet avec la plus grande entropie est sélectionné via la fonction observe() et est coloré à son tour, entrainant une nouvelle propagation. Le cas où l'on est incapable de colorier un sommet a été expliqué précédemment.
+
+
+\begin{lstlisting}[language=java]
+    public static int observe() {
+        int lowestEntropy = -1; int lowestVertex = -1; int curr_entropy;
+        for (int vertex: uncolored) {
+            curr_entropy = entropy(vertex);
+            if (curr_entropy > lowestEntropy) {
+                lowestEntropy = curr_entropy;
+                lowestVertex = vertex;
+            }
+        }
+        if (lowestEntropy == M) { lowestVertex = -1; }
+        return lowestVertex;
+    }
+\end{lstlisting}
+
+
 \subsubsection{Complexité}
-\subsubsection{Mise en oeuvre en Java }
+
+La complexité en temps de l'algorithme est O((E+V)*V) et la borne inférieure pour le problème de coloration de graphe est omega \Omega(E+V), notre implémentation n'est donc pas optimale.
+
+\subsubsection{Preuve du Lemme}
+
+Pour vérifier la validité d'une coloration, nous utilisons le Lemme suivant : \\
+\\
+Le nombre chromatique d'un graphe k-dégénéré est inférieur ou égal à k+1.
+
+Nous pouvons démontrer ce Lemme par récurrence :
+
+Cas de base (n = 1) : le Graphe G a 1 seul sommet. Le degré de ce sommet est 0 et la dégénérescence k de G est aussi 0. Pour colorier G, il ne faut qu'une seule couleur, donc le nombre chromatique est k+1.
+
+Hypothèse : Si P(n) est vrai, alors P(n+1) est aussi vrai
+
+Si G est un graphe k-dégénéré à n+1 sommets, alors G contient au moins un sommet v dont le degré est inférieur ou égal à k. Si nous retirons ce sommet, et selon la définition de la dégénérescence, nous obtenons un graphe G-v dont la dégénérescence reste k. Par l'hypothèse P(n), G-v est coloriable en k+1 couleurs. \\ Si nous rajoutons à nouveau le sommet v à G-v, et puisque le degré de v est au plus k et qu'il a donc au plus k sommets voisins, cela nous laisse avec une couleur de plus à utiliser pour la coloration. \\
+Ainsi nous prouvons par récurrence nothe hypothèse qu'un graphe k-dégénéré est coloriable avec au plus (k+1) couleurs.
+
+
 
 \newpage
 
 \section{Degénérescence et Cœurs }
 \subsection{Introduction}
+\label{sec:Degenerescence_et_Cœurs_introduction}
+
+cf. énoncé:
+Les k-cœurs d’un graphe G sont les composantes connexes du graphe obtenu après avoir supprimé itérativement les sommets de degré inférieur à k. De manière équivalente, il s’agit d’un sous-graphe connexe de G pour lequel tous les sommets sont de degré au moins k et qui est maximal pour l’inclusion, donc auquel on ne peut ajouter aucun autre sommet sans perdre cette propriété. La dégénérescence d’un graphe est le plus grand nombre k tel que le graphe a un k-cœur. \\
+Pour un sommet v de G, on peut définir sa profondeur c(v) comme le plus grand
+nombre k tel que v appartient à un k-cœur.
+
 \subsection{algorithme}
-\begin{algorithmic}
-\State $i \gets 10$
-\If{$i\geq 5$}
-    \State $i \gets i-1$
-\Else
-    \If{$i\leq 3$}
-        \State $i \gets i+2$
-    \EndIf
-\EndIf
-\end{algorithmic}
+
+D'après 4.1\nameref{sec:Degenerescence_et_Cœurs_introduction}, l'algorithme de \texttt{getDepths() }est le même qu'en 2.2 \nameref{sec:Degenerescence_algorithme}
+
 \subsubsection{Description}
+Bonus : getKCoreSizes() retourne les tailles des coeurs.
+
 \subsubsection{Complexité}
+cf. 2.2.2\nameref{sec:Degénérescence_complexité}
+
 \subsubsection{Mise en oeuvre en Java }
+
+Le code de
+\begin{lstlisting}[language=java]
+public static Map<Integer, Integer> getDepths(Graph g)
+\end{lstlisting}
+est identique à celui de  \texttt{getDegeneracy()} à la différence près que la variable \texttt{degeneracy} est absente et la valeur de retour est \texttt{depths}.
+
+\begin{lstlisting}[language=java]
+public static Integer getVertexDepth(Graph g,
+                                         int v)
+    {
+        getDepths(g);
+        return depths.get(v);
+    }
+\end{lstlisting}
+\begin{lstlisting}[language=java]
+
+public static Map<Integer, Integer> getKCoreSizes(Graph g)
+    {
+        Map<Integer, Integer> depths = getDepths(g);
+        Map<Integer, Integer> k_cores_sizes = new HashMap<>();
+        for (int depth : depths.values()) {
+            if (k_cores_sizes.containsKey(depth)) {
+                k_cores_sizes.put(depth, k_cores_sizes.get(depth) + 1);
+            } else {
+                k_cores_sizes.put(depth, 1);
+            }
+        }
+        return k_cores_sizes;
+    }
+\end{lstlisting}
 
 \newpage
 
@@ -195,21 +436,19 @@ Espace : {\displaystyle 2\vert E\vert +{\mathcal {O}}(\vert V\vert )}
 \href{https://snap.stanford.edu/data/.}{https://snap.stanford.edu/data/.}
 
 \subsection{Graphes }
-\subsubsection{ego-facebook}
-This dataset consists of 'circles' (or 'friends lists') from Facebook. Facebook data was collected from survey participants using this Facebook app. The dataset includes node features (profiles), circles, and ego networks.
-\href{https://snap.stanford.edu/data/ego-Facebook.html
-}{https://snap.stanford.edu/data/ego-Facebook.html
-}
+\subsubsection{Social community}
+\begin{itemize}
+    \item ego-facebook :
+    \href{https://snap.stanford.edu/data/ego-Facebook.html
+    }{https://snap.stanford.edu/data/ego-Facebook.html
+    }
+    \item LiveJournal :
+    \href{http://snap.stanford.edu/data/com-LiveJournal.html}{http://snap.stanford.edu/data/com-LiveJournal.html
+    }
 
+\end{itemize}
 
-\begin{figure}[H]
-  \centering
-	\includegraphics[scale=0.8]{img/graph/.png}
-  \label{fig:logo}
-\end{figure}
-
-
-\subsubsection{Road networks}
+\subsubsection{Road network}
 Intersections and endpoints are represented by nodes, and the roads connecting these intersections or endpoints are represented by undirected edges.
 
 \begin{itemize}
@@ -217,29 +456,97 @@ Intersections and endpoints are represented by nodes, and the roads connecting t
     \item roadNet-CA : California.
 \end{itemize}
 
+%\newpage
+
 \subsection{Expériences }
 CCM : coefficient de connexion moyen
-\begin{align}
 
-\begin{tabular}{|c|c|c|c|c|c|c|
-                |c|c|c|c|c|c|c|}
+TMCD : Temps Moyen en milli-secondes de Calcul  de la Dégénérescence
+
+TMCC : Temps Moyen en milli-secondes de Calcul  de la Colorabilité
+
+\begin{table}
+\centering
+
+\begin{tabular}{|c|c|c|c
+                |c|c|c|c}
 \hline
-graphe & nœuds & arêtes & CCM  & dégénérescence & colorabilité & timer \\
+%\multicolumn{1}{r}{\textbf{graphe}} & \textbf{nœuds} & \textbf{arêtes} & \textbf{CCM} \\
+graphe & nœuds & arêtes & CCM  \\
 \hline
-
-ego-facebook & 4039 & 88234 & 0.6055 & 115 &  & 400277800 \\
-roadNet-PA & 1088092 & 1541898 & 0.0465 & 6 &  & 764869138100   \\
-roadNet-CA & 1971281 & 5533214 & 0.0464 & 6 &  & 1092788984600   \\
-
+1v & 1 & 0 & 1\\
+2v1e & 2 & 1 & 1\\
+graphtest & 4 & 5 & ~0.6 \\
+ego-facebook & 4039 & 88234 & 0.6055\\
+roadNet-PA & 1088092 & 1541898 & 0.046\\
+roadNet-CA & 1971281 & 5533214 & 0.0464\\
+com-LiveJournal & 4036538 & 34681189 & 0.2843\\
+com-friendster & 124833781 & 1806067135 & 0.1623\\
 \hline
 \end{tabular}
-\end{align}
+\caption{\label{tab:table-name}Données}
+\end{table}
+
+%\newpage
+
+%\begin{comment}
+
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|c
+                |c|c|c|c|c}
+\hline
+%\multicolumn{1}{r}{\textbf{graphe}} & \textbf{nœuds} & \textbf{arêtes} & \textbf{CCM} \\
+graphe & dégénérescence & TMCD & colorabilité & TMCC \\
+\hline
+1v & 0 & 0.7719 & 1 & 0,5106 \\
+2v1e & 1 & 0.7013 & 2 & 0,4722 \\
+graphtest & 2 & 0.9016 & 3 & 2,828\\
+ego-facebook  & 115 & 80 & 75 & 61\\
+roadNet-PA  & 6 & 610 & 4 & +/-1740000 \\
+roadNet-CA  & 6 & 1741 & 5 & +/-5400000  \\
+com-LiveJournal  & 360 & 69784 & / & /  \\
+%com-friendster   & / & / & / & / \\
+\hline
+\end{tabular}
+\caption{\label{tab:table-name}Résultats }
+\end{table}
+
+%\end{comment}
+
+
+\newpage
+
+\subsection{Conclusions }
+
+Nous pouvons affirmer que, pour la majorité des graphes référencés sur SNAP, les algorithmes ont retourné le résulat demandé dans un temps raisonnable.
+
+
+Le plus grand graphe que nous avons traité est "com-LiveJournal", un graphe de 4036538 sommets et 34681189 arêtes. Cependant nous n'en avons pas fait la coloration, vu le temps que cela aurait pris. \\
+En théorie, l'algorithme Wave Function Collapse est censé être extrêmement rapide, nous en concluant donc que notre implémentation, bien que donnant des résultats très précis, n'étais pas la plus optimisée.
+
+Le coefficient de connexion moyen est en moyenne dix fois plus élevé dans les graphes de communauté sociale que dans ceux des réseaux de routes. Ce rapport est confirmé dans nos résultats par ceux des dégénérescences d'un facteur allant de 100 à 300
+
+
+
 \newpage
 
 
 
 \section{Ressources}
 \underlined{(cf. énoncé)}
+
+Wave Function Collapse Coloring: A New Heuristic for Fast Vertex Coloring :
+
+\href{https://www.researchgate.net/publication/354088959_Wave_Function_Collapse_Coloring_A_New_Heuristic_for_Fast_Vertex_Coloring}{https://www.researchgate.net/publication/\\354088959_Wave_Function_Collapse_Coloring_A_New_Heuristic_for_Fast_Vertex_Coloring}
+
+Théorème de Brook :
+
+\href{https://www.sciencedirect.com/science/article/pii/0095895675900891?via%3Dihub}{https://www.sciencedirect.com/science/article/pii/0095895675900891?via%3Dihub
+}
+
+Preuve du Lemme : \href{https://math.stackexchange.com/questions/4430669/proof-suggestion-for-the-chromatic-number-of-a-k-degenerate-graph-is-inferior}{https://math.stackexchange.com/questions/4430669/proof-suggestion-for-the-chromatic-number-of-a-k-degenerate-graph-is-inferior}
 
 Redaction scientifique:
 
@@ -255,5 +562,9 @@ Classes de la bibliothèque Java
 algs4.jar, disponible à l’adresse suivante :
 
 \href{https://algs4.cs.princeton.edu/code/.}{https://algs4.cs.princeton.edu/code/.}
+
+L'écriture du code a été accéléré à l'aide du plugin "Github Copilot"
+\href{https://copilot.github.com/}{https://copilot.github.com/}
+
 
 \end{document}
