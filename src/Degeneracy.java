@@ -88,7 +88,7 @@ public class Degeneracy {
 
             //String file_name = "ressources/graph/1v.txt";String delimiter = " ";
             //String file_name = "ressources/graph/2v1e.txt";String delimiter = " ";
-            //String file_name = "ressources/graph/graphtest";String delimiter = " ";
+            //String file_name = "ressources/graph/graphtest.txt";String delimiter = " ";
 
             //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
             //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
