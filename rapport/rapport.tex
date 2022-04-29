@@ -89,7 +89,7 @@ Ce rapport a pour but de présenter et expliquer les différents algorithmes uti
 
 
 \newpage
-\section{Degénérescence}
+\section{Dégénérescence}
 
 \subsection{Introduction}
 cf.énoncé:
@@ -362,7 +362,7 @@ Nous pouvons démontrer ce Lemme par récurrence :
 
 Cas de base (n = 1) : le Graphe G a 1 seul sommet. Le degré de ce sommet est 0 et la dégénérescence k de G est aussi 0. Pour colorier G, il ne faut qu'une seule couleur, donc le nombre chromatique est k+1.
 
-Hypothèse : Si P(n) est vrai, alors P(n+1) est aussi vrai
+Hypothèse : Si P(n) est vrai, alors P(n+1) est vrai aussi.
 
 Si G est un graphe k-dégénéré à n+1 sommets, alors G contient au moins un sommet v dont le degré est inférieur ou égal à k. Si nous retirons ce sommet, et selon la définition de la dégénérescence, nous obtenons un graphe G-v dont la dégénérescence reste k. Par l'hypothèse P(n), G-v est coloriable en k+1 couleurs. \\ Si nous rajoutons à nouveau le sommet v à G-v, et puisque le degré de v est au plus k et qu'il a donc au plus k sommets voisins, cela nous laisse avec une couleur de plus à utiliser pour la coloration. \\
 Ainsi nous prouvons par récurrence nothe hypothèse qu'un graphe k-dégénéré est coloriable avec au plus (k+1) couleurs.
@@ -371,7 +371,7 @@ Ainsi nous prouvons par récurrence nothe hypothèse qu'un graphe k-dégénéré
 
 \newpage
 
-\section{Degénérescence et Cœurs }
+\section{Dégénérescence et Cœurs }
 \subsection{Introduction}
 \label{sec:Degenerescence_et_Cœurs_introduction}
 
@@ -427,13 +427,6 @@ public static Map<Integer, Integer> getKCoreSizes(Graph g)
 
 \section{Expériences sur des graphes issus de données réelles }
 
-\subsection{Ressources }
-
-\cite{snapnets}
-\bibliographystyle{otago}
-\bibliography{\jobname}
-
-\href{https://snap.stanford.edu/data/.}{https://snap.stanford.edu/data/.}
 
 \subsection{Graphes }
 \subsubsection{Social community}
@@ -523,8 +516,8 @@ com-LiveJournal  & 360 & 69784 & / & /  \\
 Nous pouvons affirmer que, pour la majorité des graphes référencés sur SNAP, les algorithmes ont retourné le résulat demandé dans un temps raisonnable.
 
 
-Le plus grand graphe que nous avons traité est "com-LiveJournal", un graphe de 4036538 sommets et 34681189 arêtes. Cependant nous n'en avons pas fait la coloration, vu le temps que cela aurait pris. \\
-En théorie, l'algorithme Wave Function Collapse est censé être extrêmement rapide, nous en concluant donc que notre implémentation, bien que donnant des résultats très précis, n'étais pas la plus optimisée.
+Le plus grand graphe que nous avons traité est "com-LiveJournal", un graphe de 4036538 sommets et 34681189 arêtes. Cependant, nous n'en avons pas fait la coloration, vu le temps que cela aurait pris. \\
+En théorie, l'algorithme Wave Function Collapse est censé être extrêmement rapide, nous en concluant donc que notre implémentation, bien que donnant des résultats très précis, n'était pas la plus optimisée.
 
 Le coefficient de connexion moyen est en moyenne dix fois plus élevé dans les graphes de communauté sociale que dans ceux des réseaux de routes. Ce rapport est confirmé dans nos résultats par ceux des dégénérescences d'un facteur allant de 100 à 300
 
@@ -548,7 +541,7 @@ Théorème de Brook :
 
 Preuve du Lemme : \href{https://math.stackexchange.com/questions/4430669/proof-suggestion-for-the-chromatic-number-of-a-k-degenerate-graph-is-inferior}{https://math.stackexchange.com/questions/4430669/proof-suggestion-for-the-chromatic-number-of-a-k-degenerate-graph-is-inferior}
 
-Redaction scientifique:
+Rédaction scientifique:
 
 \href{http://informatique.umons.ac.be/algo/redacSci.pdf.}{http://informatique.umons.ac.be/algo/redacSci.pdf.
 }
@@ -563,7 +556,7 @@ algs4.jar, disponible à l’adresse suivante :
 
 \href{https://algs4.cs.princeton.edu/code/.}{https://algs4.cs.princeton.edu/code/.}
 
-L'écriture du code a été accéléré à l'aide du plugin "Github Copilot"
+L'écriture du code a été accélérée à l'aide du plugin "Github Copilot"
 \href{https://copilot.github.com/}{https://copilot.github.com/}
 
 
