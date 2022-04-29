@@ -88,10 +88,10 @@ public class GraphGenerator {
     //generates graph from file
     public static Graph generateGraph(String filename, String delimiter) {
         System.out.println("File name: " + filename);
-        int V = 124833781;
+        //int V = 124833781;
         //int V = getV(filename, delimiter);
         //System.out.println("Graph Vertices quantity : " + V);
-        Graph g = new Graph(V);
+        Graph g = new Graph(0);
 
         addEdges(g, filename, delimiter);
         System.out.println("Graph created");

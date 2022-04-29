@@ -51,28 +51,30 @@ public class WFC {
         uncolored = new ArrayList<>();
     }
 
+    // initialize the algo with starting values
     public static void initAlgo() {
         entropy = new LinkedList[G.V()];
         int origin=0; int degree;
         for (int i=0; i<G.V(); i++) {
             degree = G.degree(i);
-            if (degree > M) {
+            if (degree > M) {                   // init the starting domain of colors
                 M = degree;
-                origin = i;
+                origin = i;                     // select the first vertex
             }
             uncolored.add(i);
             entropy[i] = new LinkedList<>();
         }
-        colorize(origin, collapse(origin));
+        colorize(origin, collapse(origin));     // colorize the first vertex
         propagate(origin);
     }
 
+    // algo main loop
     public static int solve() {
         while(chromaticNBR == -1) {
             initAlgo();
             int newOrigin;
             while (!uncolored.isEmpty()) {
-                newOrigin = observe();
+                newOrigin = observe();      // select next vertex to colorize
                 if (newOrigin == -1) {      // restart algo with one more color
                     chromaticNBR = -1;
                     resetAlgo();
@@ -91,6 +93,7 @@ public class WFC {
         return chromaticNBR+1;
     }
 
+    // mark a vertex as colored
     public static void colorize(int v, int color) {
         coloration.put(v, color);
         uncolored.remove(Integer.valueOf(v));
@@ -111,6 +114,7 @@ public class WFC {
         return lowestVertex;
     }
 
+    // propagate color info to neighbour vertices
     public static void propagate(int v) {
         Stack<Integer> notPropagated = new Stack<>();
         notPropagated.push(v);
@@ -122,7 +126,7 @@ public class WFC {
             for (int neigh: G.adj(propagationOrigin)) {     // reduce color possibilities of neighbours
                 if (!coloration.containsKey(neigh)) {
                     if (entropy(neigh) < M-1) { entropy[neigh].add(colorOrigin); }
-                    if (entropy(neigh) == M-1) {
+                    if (entropy(neigh) == M-1) {            // only 1 possibility -> can be colored
                         colorize(neigh, collapse(neigh));
                         notPropagated.push(neigh);          // propagate new colorization
                     }

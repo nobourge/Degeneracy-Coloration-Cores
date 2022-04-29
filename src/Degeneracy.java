@@ -86,13 +86,15 @@ public class Degeneracy {
             //String file_name = "ressources/graph/graphtest.txt";String delimiter = " ";
 
             //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
-            //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
+            String file_name = "ressources/graph/roadNet-PA.txt";String delimiter = "\t";
+            //String file_name = "idk.csv";String delimiter = " ";
             //String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
             //String file_name = "ressources/graph/SNAP/com-LiveJournal.txt";String delimiter = " ";
-            String file_name = "ressources/graph/SNAP/com-friendster.ungraph.txt";String delimiter = "";
+            //String file_name = "ressources/graph/SNAP/com-friendster.ungraph.txt";String delimiter = "";
 
             g = GraphGenerator.generateGraph(file_name, delimiter);
         }
+        //System.out.println(g);
         long start2 = System.currentTimeMillis();
         long start1 = System.nanoTime();
         int degeneracy = getDegeneracy(g);
