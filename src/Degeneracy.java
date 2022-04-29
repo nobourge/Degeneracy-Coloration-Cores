@@ -85,19 +85,26 @@ public class Degeneracy {
             g = GraphGenerator.generateGraph(args[0], args[1]);
         }
         else {
-            String file_name = "graphtest";String delimiter = " ";
+
+            //String file_name = "ressources/graph/1v.txt";String delimiter = " ";
+            //String file_name = "ressources/graph/2v1e.txt";String delimiter = " ";
+            //String file_name = "ressources/graph/graphtest";String delimiter = " ";
 
             //String file_name = "ressources/graph/SNAP/facebook/facebook_combined.txt/facebook_combined.txt";String delimiter = " ";
-            //String file_name = "ressources/graph/SNAP/facebook_combined.txt/com-LiveJournal.txt";String delimiter = " ";
             //String file_name = "ressources/graph/SNAP/roadNet-PA.txt/roadNet-PA.txt";String delimiter = "\t";
             //String file_name = "ressources/graph/SNAP/roadNet-CA.txt";String delimiter = "\t";
+            //String file_name = "ressources/graph/SNAP/com-LiveJournal.txt";String delimiter = " ";
+            String file_name = "ressources/graph/SNAP/com-friendster.ungraph.txt";String delimiter = "";
+
             g = GraphGenerator.generateGraph(file_name, delimiter);
         }
+        long start2 = System.currentTimeMillis();
         long start1 = System.nanoTime();
-
         int degeneracy = getDegeneracy(g);
         long end1 = System.nanoTime();
+        long end2 = System.currentTimeMillis();
         System.out.println("Elapsed Time in nano seconds: " + (end1 - start1));
+        System.out.println("Elapsed Time in milliseconds: " + (end2 - start2));
 
         System.out.println("Degeneracy of the graph is " + degeneracy);
     }

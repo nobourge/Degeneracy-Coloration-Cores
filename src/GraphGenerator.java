@@ -9,31 +9,38 @@ public class GraphGenerator {
     public static void addEdges(Graph g, String filename, String delimiter) {
         try {
             Scanner in = new Scanner(new File(filename));
+
             //for (int i = 0; i < 2; i++) {
             for (int i = 0; i < 4; i++) {
-                String line = in.nextLine();
-                String[] tokens = line.split(delimiter);
-                if (strToInt(tokens[0]) == -1) {
-                    g.setV(strToInt(tokens[1]));
-                }
-                else if (strToInt(tokens[0]) == -2) {
-                    int E = strToInt(tokens[1]);
-                }
-                //if token[1] is "Nodes:"
-                else if (tokens[1].equals("Nodes:")) {
-                    g.setV(strToInt(tokens[2]));
-                }
-                else if (tokens[0].equals("#")) {
-                    continue;
-                }
-                else {
-                    g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
+                if (in.hasNext()) {
+
+                    String line = in.nextLine();
+                    String[] tokens = line.split(delimiter);
+                    if (strToInt(tokens[0]) == -1) {
+                        g.setV(strToInt(tokens[1]));
+                    }
+                    else if (strToInt(tokens[0]) == -2) {
+                        int E = strToInt(tokens[1]);
+                    }
+                    //if token[1] is "Nodes:"
+                    else if (tokens[1].equals("Nodes:")) {
+                        g.setV(strToInt(tokens[2]));
+                    }
+                    else if (tokens[0].equals("#")) {
+                        continue;
+                    }
+                    else {
+                        g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
+                    }
                 }
             }
             while (in.hasNext()) {
 
                 String line = in.nextLine();
                 String[] tokens = line.split(delimiter);
+                if (tokens.length == 1) {
+                    continue;
+                }
                 g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
             }
 
@@ -47,26 +54,41 @@ public class GraphGenerator {
         try {
             int V=0;
             Scanner in = new Scanner(new File(filename));
+            for (int i = 0; i < 4; i++) {
+                if (in.hasNext()) {
+                    String line = in.nextLine();
+                    String[] tokens = line.split(delimiter);
+                    if (tokens[0].equals("#") || strToInt(tokens[0]) == -1 || strToInt(tokens[0]) == -2) {
+                        continue;
+                    }
+                    else if (V < strToInt(tokens[0])) {
+                        V = strToInt(tokens[0]);
+                        //System.out.println("Graph Vertices quantity : " + V);
+                    }
+                    else if (V < strToInt(tokens[1])) {
+                        V = strToInt(tokens[1]);
+                        //System.out.println("Graph Vertices quantity : " + V);
+                    }
+                }
+            }
             while (in.hasNext()) {
 
                 String line = in.nextLine();
-                String[] tokens = line.split(delimiter);
-                if (strToInt(tokens[0]) == -1) {
+                String[] tokens = line.split("\t");
+                if (tokens.length == 1) {
                     continue;
                 }
-                else if (strToInt(tokens[0]) == -2) {
-                    continue;
-                }
-                else if (V < strToInt(tokens[0])) {
+
+                if (V < strToInt(tokens[0])) {
                     V = strToInt(tokens[0]);
                     //System.out.println("Graph Vertices quantity : " + V);
 
                 }
-                else if (V < strToInt(tokens[1])) {
+                if (V < strToInt(tokens[1])) {
                     V = strToInt(tokens[1]);
                     //System.out.println("Graph Vertices quantity : " + V);
-
                 }
+
             }
 
             //System.out.println("Graph Vertices quantity : " + V);
