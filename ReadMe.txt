@@ -12,6 +12,10 @@ Enfin, les fichiers doivent commencer par une ligne comme celle-ci : "-1 [nombre
 
 
 1. Dégénérescence :
+    1- compiler le fichier avec la commande "javac Degeneracy.java"
+	2- lancer avec la commande "java Degeneracy -f -c "
+		-f étant le nom du fichier texte contenant les données du graphe
+		-c étant le caractère de délimitation qui sépare les 2 numéros de sommets à chaque ligne. Il est probable qu'il faille l'entourer de "".
 
 
 2. Coloration :
@@ -22,3 +26,7 @@ Enfin, les fichiers doivent commencer par une ligne comme celle-ci : "-1 [nombre
 
 	
 3. Coeurs :
+    1- compiler le fichier avec la commande "javac Cores.java"
+    2- lancer avec la commande "java Cores -f -c "
+        -f étant le nom du fichier texte contenant les données du graphe
+        -c étant le caractère de délimitation qui sépare les 2 numéros de sommets à chaque ligne. Il est probable qu'il faille l'entourer de "".
