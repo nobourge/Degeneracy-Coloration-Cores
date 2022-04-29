@@ -15,19 +15,23 @@ public class GraphGenerator {
 
                     String line = in.nextLine();
                     String[] tokens = line.split(delimiter);
-                    if (strToInt(tokens[0]) == -1) {
+                    if (tokens[0].equals("#")) {
+                        continue;
+                    }
+                    /*
+                    else if (strToInt(tokens[0]) == -1) {
                         g.setV(strToInt(tokens[1]));
                     }
                     else if (strToInt(tokens[0]) == -2) {
                         int E = strToInt(tokens[1]);
                     }
+
+                     */
                     //if token[1] is "Nodes:"
                     else if (tokens[1].equals("Nodes:")) {
                         g.setV(strToInt(tokens[2]));
                     }
-                    else if (tokens[0].equals("#")) {
-                        continue;
-                    }
+
                     else {
                         g.addEdge(strToInt(tokens[1]), strToInt(tokens[0]));
                     }
@@ -88,8 +92,11 @@ public class GraphGenerator {
     //generates graph from file
     public static Graph generateGraph(String filename, String delimiter) {
         System.out.println("File name: " + filename);
-        System.out.println("Graph Vertices quantity : " + GraphGenerator.getV(filename, delimiter));
-        Graph g = new Graph(0);
+        int V = 124833781;
+        //int V = getV(filename, delimiter);
+        //System.out.println("Graph Vertices quantity : " + V);
+        Graph g = new Graph(V);
+
         addEdges(g, filename, delimiter);
         System.out.println("Graph created");
 
